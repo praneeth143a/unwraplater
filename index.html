@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnwrapLater - Time Capsule Messages</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎁</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>UnwrapLater</h1>
+            <p>Create time capsule messages with themed animations</p>
+            <div class="theme-toggle">
+                <button id="darkModeToggle" aria-label="Toggle dark mode">
+                    <span class="moon">🌙</span>
+                    <span class="sun">☀️</span>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <section id="create-section" class="active-section">
+                <h2>Create Your Time Capsule</h2>
+                
+                <form id="capsule-form">
+                    <div class="form-group">
+                        <label for="message">Your Message</label>
+                        <textarea id="message" placeholder="Write your message here..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="unlock-date">Unlock Date and Time</label>
+                        <input type="datetime-local" id="unlock-date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="passphrase">Passphrase (Optional)</label>
+                        <input type="password" id="passphrase" placeholder="Add a passphrase for extra security">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="theme-select">Select Theme</label>
+                        <div class="theme-selector">
+                            <div class="theme-option" data-theme="love">
+                                <span class="theme-icon">💖</span>
+                                <span class="theme-name">Love</span>
+                            </div>
+                            <div class="theme-option" data-theme="bestFriends">
+                                <span class="theme-icon">🤝</span>
+                                <span class="theme-name">Best Friends</span>
+                            </div>
+                            <div class="theme-option" data-theme="birthday">
+                                <span class="theme-icon">🎂</span>
+                                <span class="theme-name">Birthday</span>
+                            </div>
+                            <div class="theme-option" data-theme="celebration">
+                                <span class="theme-icon">🎉</span>
+                                <span class="theme-name">Celebration</span>
+                            </div>
+                            <input type="hidden" id="theme-select" value="love">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="media-upload">Attach Media (Optional)</label>
+                        <div class="media-upload-container">
+                            <input type="file" id="media-upload" accept="image/jpeg,image/png,video/mp4,video/webm" class="hidden-input">
+                            <label for="media-upload" class="upload-btn">
+                                <span class="upload-icon">📎</span>
+                                <span>Upload Image or Video</span>
+                            </label>
+                            <div id="media-preview" class="hidden"></div>
+                            <button type="button" id="remove-media" class="hidden">Remove Media</button>
+                        </div>
+                    </div>
+                    
+                    <button type="button" id="preview-btn" class="primary-btn">Preview Capsule</button>
+                </form>
+            </section>
+
+            <section id="preview-section" class="hidden-section">
+                <h2>Preview Your Capsule</h2>
+                
+                <div class="preview-container">
+                    <div id="preview-theme-display"></div>
+                    <div id="preview-media-container"></div>
+                    <div id="preview-message"></div>
+                    <div class="preview-details">
+                        <p>Unlock date: <span id="preview-date"></span></p>
+                        <p id="preview-passphrase-info" class="hidden">Passphrase protection enabled</p>
+                        <p>Theme: <span id="preview-theme"></span></p>
+                    </div>
+                </div>
+                
+                <div class="preview-actions">
+                    <button type="button" id="back-to-edit" class="secondary-btn">Back to Edit</button>
+                    <button type="button" id="create-capsule" class="primary-btn animated-btn">Create Capsule</button>
+                </div>
+            </section>
+
+            <section id="share-section" class="hidden-section">
+                <h2>Share Your Time Capsule</h2>
+                
+                <div class="share-container">
+                    <p>Your time capsule is ready! Share this link with the recipient:</p>
+                    <div class="link-container">
+                        <input type="text" id="capsule-link" readonly>
+                        <button type="button" id="copy-link" aria-label="Copy link">📋</button>
+                    </div>
+                    <div class="qr-container">
+                        <div id="qr-code"></div>
+                        <button type="button" id="download-qr" class="secondary-btn">Download QR Code</button>
+                    </div>
+                    <div class="download-container">
+                        <button type="button" id="download-capsule" class="secondary-btn">Download Capsule</button>
+                    </div>
+                </div>
+                
+                <button type="button" id="create-new" class="primary-btn">Create New Capsule</button>
+            </section>
+
+            <section id="unlock-section" class="hidden-section">
+                <h2>Your Time Capsule</h2>
+                
+                <div id="locked-container" class="capsule-container">
+                    <div class="lock-icon">🔒</div>
+                    <p id="unlock-message">This capsule will unlock on <span id="unlock-date-display"></span></p>
+                    
+                    <div id="passphrase-container" class="hidden">
+                        <input type="password" id="enter-passphrase" placeholder="Enter passphrase">
+                        <button type="button" id="submit-passphrase" class="primary-btn">Unlock</button>
+                        <p id="passphrase-error" class="error hidden">Incorrect passphrase. Please try again.</p>
+                    </div>
+                    
+                    <div id="time-remaining">
+                        <div class="countdown-item">
+                            <span id="days-remaining">--</span>
+                            <span class="countdown-label">Days</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span id="hours-remaining">--</span>
+                            <span class="countdown-label">Hours</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span id="minutes-remaining">--</span>
+                            <span class="countdown-label">Minutes</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span id="seconds-remaining">--</span>
+                            <span class="countdown-label">Seconds</span>
+                        </div>
+                    </div>
+                    
+                    <div id="unlock-now-container" class="hidden">
+                        <button type="button" id="unlock-now" class="primary-btn animated-btn">Unlock Now</button>
+                    </div>
+                </div>
+                
+                <div id="unlocked-container" class="capsule-container hidden">
+                    <div id="theme-animation-container"></div>
+                    <div id="message-reveal"></div>
+                    <div id="media-reveal" class="hidden"></div>
+                    
+                    <div class="unlock-actions">
+                        <button type="button" id="download-memory" class="secondary-btn">Download Memory</button>
+                        <button type="button" id="create-response" class="primary-btn">Create Your Own</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 UnwrapLater - Digital Time Capsules</p>
+            <p>Crafted with ❤️ for sharing moments across time</p>
+        </footer>
+    </div>
+
+    <!-- Canvas elements for animations -->
+    <canvas id="animation-canvas" class="hidden"></canvas>
+    
+    <!-- QRCode.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- Utility scripts -->
+    <script src="js/crypto.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/utility.js"></script>
+    <script src="js/helpers.js"></script>
+    <script src="js/animationHelpers.js"></script>
+    <script src="js/themes.js"></script>
+    <script src="js/theme-service.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/media.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html> 
