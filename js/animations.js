@@ -12,25 +12,41 @@ const AnimationManager = (() => {
     let audioContext = null;
     let audioElements = {};
     
+    console.log('AnimationManager module loading');
+    
     /**
      * Initialize the animation canvas
      */
     const initCanvas = () => {
+        console.log('Initializing animation canvas');
         animationCanvas = document.getElementById('animation-canvas');
-        if (!animationCanvas) return false;
+        if (!animationCanvas) {
+            console.error('Animation canvas not found');
+            return false;
+        }
+        
+        console.log('Canvas element found:', animationCanvas);
         
         ctx = animationCanvas.getContext('2d');
+        if (!ctx) {
+            console.error('Failed to get 2D context from canvas');
+            return false;
+        }
         
         // Set canvas to full window size
         animationCanvas.width = window.innerWidth;
         animationCanvas.height = window.innerHeight;
         
+        console.log('Canvas dimensions set:', animationCanvas.width, 'x', animationCanvas.height);
+        
         // Handle resize
         window.addEventListener('resize', () => {
             animationCanvas.width = window.innerWidth;
             animationCanvas.height = window.innerHeight;
+            console.log('Canvas resized to:', animationCanvas.width, 'x', animationCanvas.height);
         });
         
+        console.log('Animation canvas initialized successfully');
         return true;
     };
     
@@ -97,19 +113,22 @@ const AnimationManager = (() => {
      * @param {string} [customColor=null] - Custom color for the animation (hex)
      */
     const playAnimation = (theme, container, withSound = false, customColor = null) => {
+        console.log('Playing animation for theme:', theme);
+        
+        // Initialize canvas if not already done
+        if (!animationCanvas || !ctx) {
+            const initialized = initCanvas();
+            if (!initialized) {
+                console.error('Failed to initialize animation canvas');
+                return;
+            }
+        }
+        
         // Clear any existing animation
         stopAnimation();
         
-        // Get a reference to the canvas
-        const canvas = document.getElementById('animation-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Set canvas dimensions to match the window
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        
         // Show the canvas
-        canvas.classList.remove('hidden');
+        animationCanvas.classList.remove('hidden');
         
         // Set animation based on theme
         let animationFunction;
@@ -203,9 +222,10 @@ const AnimationManager = (() => {
      * Stop current animation
      */
     const stopAnimation = () => {
-        if (animationFrameId) {
-            cancelAnimationFrame(animationFrameId);
-            animationFrameId = null;
+        console.log('Stopping animation');
+        if (currentAnimation) {
+            cancelAnimationFrame(currentAnimation);
+            currentAnimation = null;
         }
         
         // Stop all audio
@@ -225,8 +245,6 @@ const AnimationManager = (() => {
         if (animationCanvas) {
             animationCanvas.classList.add('hidden');
         }
-        
-        currentAnimation = null;
     };
     
     /**
@@ -295,18 +313,36 @@ const AnimationManager = (() => {
      * Start stars animation for Best Friends theme
      */
     const startStarsAnimation = (ctx, colors) => {
+        // Get the canvas dimensions
+        const canvasWidth = animationCanvas.width;
+        const canvasHeight = animationCanvas.height;
+        
+        // Constrain stars to center area (only 60% of the canvas width/height)
+        const centerX = canvasWidth / 2;
+        const centerY = canvasHeight / 2;
+        const radiusX = canvasWidth * 0.3; // 30% of width from center
+        const radiusY = canvasHeight * 0.3; // 30% of height from center
+        
         // Use AnimationHelpers to create particle system for stars
         const starParticles = AnimationHelpers.createParticleSystem({
-            count: 50,
-            createParticle: () => ({
-                x: Math.random() * animationCanvas.width,
-                y: Math.random() * animationCanvas.height,
-                size: Math.random() * 20 + 5,
-                opacity: Math.random() * 0.5 + 0.3,
-                pulse: Math.random() * 0.1 + 0.05,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                pulseTiming: Math.random() * Math.PI * 2
-            }),
+            count: 30, // Reduced from 50
+            createParticle: () => {
+                // Position stars within the constrained area (elliptical distribution)
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 0.9; // 0-90% of the radius
+                const x = centerX + Math.cos(angle) * radiusX * distance;
+                const y = centerY + Math.sin(angle) * radiusY * distance;
+                
+                return {
+                    x: x,
+                    y: y,
+                    size: Math.random() * 15 + 5, // Slightly smaller stars
+                    opacity: Math.random() * 0.5 + 0.3,
+                    pulse: Math.random() * 0.1 + 0.05,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    pulseTiming: Math.random() * Math.PI * 2
+                };
+            },
             updateParticle: (particle, index, particles) => {
                 particle.pulseTiming += particle.pulse;
                 particle.opacity = 0.3 + Math.sin(particle.pulseTiming) * 0.3;
@@ -600,10 +636,14 @@ const AnimationManager = (() => {
         animate();
     };
     
-    // Public API
+    // Initialize when the module loads
+    document.addEventListener('DOMContentLoaded', initCanvas);
+    
+    // Return public API
     return {
         playAnimation,
-        stopAnimation
+        stopAnimation,
+        initCanvas
     };
 })();
 
@@ -895,4 +935,10 @@ const startFireworksAnimation = (ctx, colors) => {
     }
     
     animate();
-}; 
+};
+
+// Initialize the AnimationManager
+document.addEventListener('DOMContentLoaded', () => {
+    // Any additional initialization
+    console.log('AnimationManager initialized');
+}); 

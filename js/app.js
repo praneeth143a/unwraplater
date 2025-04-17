@@ -3,6 +3,14 @@
  * Main application file for the time capsule message service
  */
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize AnimationManager
+    if (typeof AnimationManager !== 'undefined' && AnimationManager.initCanvas) {
+        console.log('Initializing AnimationManager from app.js');
+        AnimationManager.initCanvas();
+    } else {
+        console.error('AnimationManager not available');
+    }
+    
     // DOM Elements
     const previewBtn = document.getElementById('preview-btn');
     const backToEditBtn = document.getElementById('back-to-edit');
