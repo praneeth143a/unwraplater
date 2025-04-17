@@ -212,6 +212,25 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        // Get theme information
+        let selectedTheme = themeSelect.value;
+        let customAnimation = null;
+        let customColor = null;
+        
+        // If custom theme is selected, handle the animation type
+        if (selectedTheme === 'custom') {
+            customColor = customColorPicker ? customColorPicker.value : '#0078d7';
+            
+            if (customAnimationSelect) {
+                customAnimation = customAnimationSelect.value;
+                
+                // If random is selected, choose a random animation for preview
+                if (customAnimation === 'random') {
+                    customAnimation = getRandomAnimation();
+                }
+            }
+        }
+        
         // Update preview elements
         previewMessage.textContent = messageInput.value;
         
@@ -231,14 +250,29 @@ document.addEventListener('DOMContentLoaded', () => {
         previewPassphraseInfo.classList.toggle('hidden', !passphraseInput.value);
         
         // Show selected theme
-        const selectedTheme = themeSelect.value;
-        previewTheme.textContent = document.querySelector(`.theme-option[data-theme="${selectedTheme}"] .theme-name`).textContent;
+        const themeName = document.querySelector(`.theme-option[data-theme="${selectedTheme}"] .theme-name`).textContent;
+        previewTheme.textContent = selectedTheme === 'custom' ? `${themeName} (${customAnimation})` : themeName;
+        
+        // Apply custom theme colors to preview if selected
+        if (selectedTheme === 'custom' && customColor) {
+            previewThemeDisplay.style.background = `linear-gradient(135deg, ${customColor} 0%, ${adjustColor(customColor, 20)} 100%)`;
+            previewThemeDisplay.style.opacity = '0.2';
+        } else {
+            previewThemeDisplay.style.background = '';
+            previewThemeDisplay.style.opacity = '';
+        }
         
         // Display theme preview animation
         previewThemeDisplay.innerHTML = '';
         const animationCanvas = document.getElementById('animation-canvas');
         animationCanvas.classList.remove('hidden');
-        AnimationManager.playAnimation(selectedTheme, previewThemeDisplay);
+        
+        // Use the selected animation for custom theme
+        if (selectedTheme === 'custom' && customAnimation) {
+            AnimationManager.playAnimation(customAnimation, previewThemeDisplay, true, customColor);
+        } else {
+            AnimationManager.playAnimation(selectedTheme, previewThemeDisplay);
+        }
         
         // Add media preview if available
         previewMediaContainer.innerHTML = '';
@@ -294,12 +328,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // Stop animations before proceeding
         AnimationManager.stopAnimation();
         
+        // Get theme information
+        let selectedTheme = themeSelect.value;
+        let customAnimation = null;
+        
+        // If custom theme is selected, handle the animation type
+        if (selectedTheme === 'custom' && customAnimationSelect) {
+            customAnimation = customAnimationSelect.value;
+            
+            // If random is selected, choose a random animation
+            if (customAnimation === 'random') {
+                customAnimation = getRandomAnimation();
+            }
+        }
+        
         // Create the capsule object
         const capsule = {
             id: CryptoUtil.generateId(),
             message: messageInput.value,
             unlockDate: unlockDateInput.value,
-            theme: themeSelect.value,
+            theme: selectedTheme,
+            customAnimation: customAnimation, // Store the custom animation type
+            customColor: selectedTheme === 'custom' ? customColorPicker.value : null,
             hasPassphrase: !!passphraseInput.value,
             createdAt: new Date().toISOString()
         };
@@ -768,6 +818,17 @@ document.addEventListener('DOMContentLoaded', () => {
         customThemeOption.addEventListener('click', () => {
             setTimeout(() => {
                 customThemeOptions.style.display = 'block';
+                
+                // Set blue as default color when custom is selected
+                if (customColorPicker) {
+                    customColorPicker.value = '#0078d7'; // Microsoft blue
+                    updateCustomThemePreview('#0078d7');
+                }
+                
+                // Set animation to random by default
+                if (customAnimationSelect) {
+                    customAnimationSelect.value = 'random';
+                }
             }, 150);
         });
         
@@ -782,13 +843,43 @@ document.addEventListener('DOMContentLoaded', () => {
         if (customColorPicker) {
             customColorPicker.addEventListener('input', (e) => {
                 const color = e.target.value;
-                customThemePreview.style.background = `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, 20)} 100%)`;
+                updateCustomThemePreview(color);
             });
             
-            // Initialize with a default color
-            customColorPicker.value = '#8e44ad';
-            customThemePreview.style.background = 'linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%)';
+            // Initialize with a default blue color
+            customColorPicker.value = '#0078d7';
+            updateCustomThemePreview('#0078d7');
         }
+    }
+    
+    /**
+     * Update the custom theme preview with the selected color
+     * @param {string} color - Hex color value
+     */
+    function updateCustomThemePreview(color) {
+        if (customThemePreview) {
+            customThemePreview.style.background = `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, 20)} 100%)`;
+            
+            // Also update the custom theme option background
+            if (customThemeOption) {
+                customThemeOption.style.borderColor = color;
+                customThemeOption.style.boxShadow = `0 0 0 2px ${adjustColor(color, -20)}`;
+                
+                // Add a subtle background
+                const bgColor = adjustColor(color, 90); // Much lighter version for background
+                customThemeOption.style.background = bgColor;
+            }
+        }
+    }
+    
+    /**
+     * Get a random animation type for custom theme
+     * @returns {string} Random animation type
+     */
+    function getRandomAnimation() {
+        const animations = ['hearts', 'stars', 'confetti', 'bubbles', 'sparkles', 'fireworks'];
+        const randomIndex = Math.floor(Math.random() * animations.length);
+        return animations[randomIndex];
     }
 });
 
