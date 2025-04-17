@@ -145,6 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = e.target.files[0];
         
         if (file) {
+            // Check file size (limit to 10MB per file)
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+            if (file.size > MAX_FILE_SIZE) {
+                alert('File is too large. Maximum size is 10MB.');
+                return;
+            }
+            
             currentMediaFile = file;
             
             const reader = new FileReader();
@@ -157,11 +164,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     mediaPreview.appendChild(img);
-                } else if (file.type.startsWith('video/')) {
-                    const video = document.createElement('video');
-                    video.src = e.target.result;
-                    video.controls = true;
-                    mediaPreview.appendChild(video);
+                } else if (file.type.startsWith('audio/')) {
+                    const audio = document.createElement('audio');
+                    audio.src = e.target.result;
+                    audio.controls = true;
+                    
+                    // Add a container with some styling for the audio player
+                    const audioContainer = document.createElement('div');
+                    audioContainer.className = 'audio-container';
+                    
+                    // Add an icon or waveform visualization
+                    const audioIcon = document.createElement('div');
+                    audioIcon.className = 'audio-icon';
+                    audioIcon.innerHTML = '🎵';
+                    
+                    // Add file name
+                    const audioName = document.createElement('div');
+                    audioName.className = 'audio-name';
+                    audioName.textContent = file.name;
+                    
+                    audioContainer.appendChild(audioIcon);
+                    audioContainer.appendChild(audio);
+                    audioContainer.appendChild(audioName);
+                    mediaPreview.appendChild(audioContainer);
                 }
             };
             
@@ -220,11 +245,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const img = document.createElement('img');
                 img.src = URL.createObjectURL(currentMediaFile);
                 previewMediaContainer.appendChild(img);
-            } else if (currentMediaFile.type.startsWith('video/')) {
-                const video = document.createElement('video');
-                video.src = URL.createObjectURL(currentMediaFile);
-                video.controls = true;
-                previewMediaContainer.appendChild(video);
+            } else if (currentMediaFile.type.startsWith('audio/')) {
+                const audioContainer = document.createElement('div');
+                audioContainer.className = 'audio-container';
+                
+                const audioIcon = document.createElement('div');
+                audioIcon.className = 'audio-icon';
+                audioIcon.innerHTML = '🎵';
+                
+                const audio = document.createElement('audio');
+                audio.src = URL.createObjectURL(currentMediaFile);
+                audio.controls = true;
+                
+                const audioName = document.createElement('div');
+                audioName.className = 'audio-name';
+                audioName.textContent = currentMediaFile.name;
+                
+                audioContainer.appendChild(audioIcon);
+                audioContainer.appendChild(audio);
+                audioContainer.appendChild(audioName);
+                previewMediaContainer.appendChild(audioContainer);
             }
         }
         
@@ -813,11 +853,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const img = document.createElement('img');
                 img.src = capsuleMedia.data;
                 mediaReveal.appendChild(img);
-            } else if (capsuleMedia.type.startsWith('video/')) {
-                const video = document.createElement('video');
-                video.src = capsuleMedia.data;
-                video.controls = true;
-                mediaReveal.appendChild(video);
+            } else if (capsuleMedia.type.startsWith('audio/')) {
+                const audioContainer = document.createElement('div');
+                audioContainer.className = 'audio-container';
+                
+                const audioIcon = document.createElement('div');
+                audioIcon.className = 'audio-icon';
+                audioIcon.innerHTML = '🎵';
+                
+                const audio = document.createElement('audio');
+                audio.src = capsuleMedia.data;
+                audio.controls = true;
+                
+                const audioName = document.createElement('div');
+                audioName.className = 'audio-name';
+                audioName.textContent = 'Audio Message';
+                
+                audioContainer.appendChild(audioIcon);
+                audioContainer.appendChild(audio);
+                audioContainer.appendChild(audioName);
+                mediaReveal.appendChild(audioContainer);
             }
         }
         
