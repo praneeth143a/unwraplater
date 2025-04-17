@@ -336,30 +336,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Clear any previous content
                 qrContainer.innerHTML = '';
                 
-                let qrCanvas = null;
-                
-                // Use the Helpers.generateQRCode function
-                if (typeof Helpers !== 'undefined' && Helpers.generateQRCode) {
-                    qrCanvas = Helpers.generateQRCode(shareLink, qrContainer, {
-                        size: 200,
+                // Use the QRCode.js library directly (more reliable for scanning)
+                if (typeof QRCode !== 'undefined') {
+                    // Create new QR code instance
+                    new QRCode(qrContainer, {
+                        text: shareLink,
+                        width: 200,
+                        height: 200,
                         colorDark: '#8e44ad',
-                        colorLight: '#FFFFFF'
+                        colorLight: '#FFFFFF',
+                        correctLevel: QRCode.CorrectLevel.H // High error correction
                     });
                     
                     // Setup download QR code button
                     const downloadQrBtn = document.getElementById('download-qr');
-                    if (downloadQrBtn && qrCanvas) {
+                    if (downloadQrBtn) {
                         // Remove any existing event listeners
                         const newDownloadBtn = downloadQrBtn.cloneNode(true);
                         downloadQrBtn.parentNode.replaceChild(newDownloadBtn, downloadQrBtn);
                         
                         // Add event listener for download
                         newDownloadBtn.addEventListener('click', () => {
-                            Helpers.downloadCanvas(qrCanvas, `unwraplater-qr-${capsule.id}.png`);
+                            // Get the canvas or image from the container
+                            const canvas = qrContainer.querySelector('canvas');
+                            const image = qrContainer.querySelector('img');
+                            
+                            if (canvas) {
+                                // Convert canvas to data URL and download
+                                const dataUrl = canvas.toDataURL('image/png');
+                                const a = document.createElement('a');
+                                a.href = dataUrl;
+                                a.download = `unwraplater-qr-${capsule.id}.png`;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                            } else if (image) {
+                                // If we only have an image, create a temporary link to download it
+                                const a = document.createElement('a');
+                                // Use a canvas to convert the image to a downloadable format
+                                const tempCanvas = document.createElement('canvas');
+                                tempCanvas.width = image.width;
+                                tempCanvas.height = image.height;
+                                const ctx = tempCanvas.getContext('2d');
+                                ctx.drawImage(image, 0, 0);
+                                a.href = tempCanvas.toDataURL('image/png');
+                                a.download = `unwraplater-qr-${capsule.id}.png`;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                            }
                         });
                     }
                 } else {
-                    console.error('QR code generation function not available');
+                    console.error('QRCode library not available');
                     // Fallback message
                     qrContainer.innerHTML = '<p>QR code generation is not available</p>';
                     

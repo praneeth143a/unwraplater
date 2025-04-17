@@ -568,11 +568,11 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f0f8ff;
+    background-color: white; /* Use pure white for best QR code scanning */
     border-radius: 8px;
     padding: 10px;
     overflow: hidden;
-    border: 1px solid #bde0ff;
+    border: 1px solid #ddd;
 }
 
 #qr-code img {
