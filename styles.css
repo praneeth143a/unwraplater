@@ -553,7 +553,71 @@ button {
     padding: var(--spacing-md);
 }
 
-.qr-container, .download-container {
+/* Social Share Buttons */
+.social-share-container {
+    margin-top: var(--spacing-lg);
+}
+
+.social-share-container h3 {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-color);
+}
+
+.share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    justify-content: center;
+}
+
+.share-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    color: white;
+    min-width: 80px;
+    text-align: center;
+    font-weight: 500;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.share-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.share-icon {
+    font-size: 1.8rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Individual share button styles */
+.whatsapp-btn {
+    background-color: #25D366;
+}
+
+.facebook-btn {
+    background-color: #3b5998;
+}
+
+.twitter-btn {
+    background-color: #1DA1F2;
+}
+
+.email-btn {
+    background-color: #D44638;
+}
+
+.sms-btn {
+    background-color: #7BC62E;
+}
+
+.download-container {
     margin-top: var(--spacing-lg);
     display: flex;
     flex-direction: column;

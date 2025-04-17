@@ -329,81 +329,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const shareLink = `${window.location.origin}${window.location.pathname}?capsule=${capsule.id}`;
         document.getElementById('capsule-link').value = shareLink;
         
-        // Generate QR code
-        try {
-            const qrContainer = document.getElementById('qr-code');
-            if (qrContainer) {
-                // Clear any previous content
-                qrContainer.innerHTML = '';
-                
-                // Use the QRCode.js library directly (more reliable for scanning)
-                if (typeof QRCode !== 'undefined') {
-                    // Create new QR code instance
-                    new QRCode(qrContainer, {
-                        text: shareLink,
-                        width: 200,
-                        height: 200,
-                        colorDark: '#8e44ad',
-                        colorLight: '#FFFFFF',
-                        correctLevel: QRCode.CorrectLevel.H // High error correction
-                    });
-                    
-                    // Setup download QR code button
-                    const downloadQrBtn = document.getElementById('download-qr');
-                    if (downloadQrBtn) {
-                        // Remove any existing event listeners
-                        const newDownloadBtn = downloadQrBtn.cloneNode(true);
-                        downloadQrBtn.parentNode.replaceChild(newDownloadBtn, downloadQrBtn);
-                        
-                        // Add event listener for download
-                        newDownloadBtn.addEventListener('click', () => {
-                            // Get the canvas or image from the container
-                            const canvas = qrContainer.querySelector('canvas');
-                            const image = qrContainer.querySelector('img');
-                            
-                            if (canvas) {
-                                // Convert canvas to data URL and download
-                                const dataUrl = canvas.toDataURL('image/png');
-                                const a = document.createElement('a');
-                                a.href = dataUrl;
-                                a.download = `unwraplater-qr-${capsule.id}.png`;
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                            } else if (image) {
-                                // If we only have an image, create a temporary link to download it
-                                const a = document.createElement('a');
-                                // Use a canvas to convert the image to a downloadable format
-                                const tempCanvas = document.createElement('canvas');
-                                tempCanvas.width = image.width;
-                                tempCanvas.height = image.height;
-                                const ctx = tempCanvas.getContext('2d');
-                                ctx.drawImage(image, 0, 0);
-                                a.href = tempCanvas.toDataURL('image/png');
-                                a.download = `unwraplater-qr-${capsule.id}.png`;
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                            }
-                        });
-                    }
-                } else {
-                    console.error('QRCode library not available');
-                    // Fallback message
-                    qrContainer.innerHTML = '<p>QR code generation is not available</p>';
-                    
-                    // Hide download button
-                    const downloadQrBtn = document.getElementById('download-qr');
-                    if (downloadQrBtn) {
-                        downloadQrBtn.style.display = 'none';
-                    }
-                }
-            } else {
-                console.error('QR code container not found');
-            }
-        } catch (error) {
-            console.error('Failed to generate QR code:', error);
-        }
+        // Set up social sharing buttons
+        setupSocialSharing(shareLink, capsule);
         
         // Hide preview section, show share section
         previewSection.classList.remove('active-section');
@@ -411,6 +338,72 @@ document.addEventListener('DOMContentLoaded', () => {
         shareSection.classList.remove('hidden-section');
         shareSection.classList.add('active-section');
     });
+    
+    /**
+     * Set up social sharing functionality
+     * @param {string} shareUrl - URL to be shared
+     * @param {Object} capsule - Capsule object with message and details
+     */
+    function setupSocialSharing(shareUrl, capsule) {
+        // Create share text with message preview (truncated)
+        const messagePreview = capsule.message.length > 30 
+            ? capsule.message.substring(0, 30) + '...' 
+            : capsule.message;
+        
+        const shareTitle = 'Check out my UnwrapLater time capsule!';
+        const shareText = `${shareTitle} It will unlock on ${new Date(capsule.unlockDate).toLocaleDateString()}`;
+        
+        // WhatsApp Share
+        const whatsappBtn = document.getElementById('share-whatsapp');
+        if (whatsappBtn) {
+            whatsappBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
+                window.open(whatsappUrl, '_blank');
+            });
+        }
+        
+        // Facebook Share
+        const facebookBtn = document.getElementById('share-facebook');
+        if (facebookBtn) {
+            facebookBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+                window.open(facebookUrl, '_blank');
+            });
+        }
+        
+        // Twitter Share
+        const twitterBtn = document.getElementById('share-twitter');
+        if (twitterBtn) {
+            twitterBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+                window.open(twitterUrl, '_blank');
+            });
+        }
+        
+        // Email Share
+        const emailBtn = document.getElementById('share-email');
+        if (emailBtn) {
+            emailBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const subject = encodeURIComponent(shareTitle);
+                const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
+                window.location.href = `mailto:?subject=${subject}&body=${body}`;
+            });
+        }
+        
+        // SMS Share
+        const smsBtn = document.getElementById('share-sms');
+        if (smsBtn) {
+            smsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const smsText = encodeURIComponent(`${shareText} ${shareUrl}`);
+                window.location.href = `sms:?body=${smsText}`;
+            });
+        }
+    }
     
     // Handle create new capsule button
     createNewBtn.addEventListener('click', () => {
