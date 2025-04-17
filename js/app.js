@@ -377,7 +377,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Generate share link
         const shareLink = `${window.location.origin}${window.location.pathname}?capsule=${capsule.id}`;
-        document.getElementById('capsule-link').value = shareLink;
+        
+        // Set the link input value
+        const linkInput = document.getElementById('capsule-link');
+        linkInput.value = shareLink;
         
         // Set up social sharing buttons
         setupSocialSharing(shareLink, capsule);
@@ -803,111 +806,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Custom theme handling
-    const customThemeOption = document.querySelector('.theme-option[data-theme="custom"]');
-    const customThemeOptions = document.getElementById('custom-theme-options');
-    const customColorPicker = document.getElementById('custom-color');
-    const customThemePreview = document.querySelector('.custom-theme-preview');
-    const customAnimationSelect = document.getElementById('custom-animation');
-    
-    if (customThemeOption && customThemeOptions) {
-        // Hide custom options initially
-        customThemeOptions.style.display = 'none';
-        
-        // Show custom options when custom theme is selected
-        customThemeOption.addEventListener('click', () => {
-            setTimeout(() => {
-                customThemeOptions.style.display = 'block';
-                
-                // Set blue as default color when custom is selected
-                if (customColorPicker) {
-                    customColorPicker.value = '#0078d7'; // Microsoft blue
-                    updateCustomThemePreview('#0078d7');
-                }
-                
-                // Set animation to random by default
-                if (customAnimationSelect) {
-                    customAnimationSelect.value = 'random';
-                }
-            }, 150);
-        });
-        
-        // Hide custom options when other themes are selected
-        document.querySelectorAll('.theme-option:not([data-theme="custom"])').forEach(option => {
-            option.addEventListener('click', () => {
-                customThemeOptions.style.display = 'none';
-            });
-        });
-        
-        // Update custom theme preview when color is changed
-        if (customColorPicker) {
-            customColorPicker.addEventListener('input', (e) => {
-                const color = e.target.value;
-                updateCustomThemePreview(color);
-            });
-            
-            // Initialize with a default blue color
-            customColorPicker.value = '#0078d7';
-            updateCustomThemePreview('#0078d7');
-        }
-    }
-    
+    // Theme handling functions
     /**
-     * Update the custom theme preview with the selected color
-     * @param {string} color - Hex color value
+     * Adjusts a hex color by the specified percent
+     * @param {string} color - The hex color to adjust
+     * @param {number} percent - Percent to lighten (positive) or darken (negative)
+     * @returns {string} - The adjusted hex color
      */
-    function updateCustomThemePreview(color) {
-        if (customThemePreview) {
-            customThemePreview.style.background = `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, 20)} 100%)`;
-            
-            // Also update the custom theme option background
-            if (customThemeOption) {
-                customThemeOption.style.borderColor = color;
-                customThemeOption.style.boxShadow = `0 0 0 2px ${adjustColor(color, -20)}`;
-                
-                // Add a subtle background
-                const bgColor = adjustColor(color, 90); // Much lighter version for background
-                customThemeOption.style.background = bgColor;
-            }
-        }
-    }
-    
-    /**
-     * Get a random animation type for custom theme
-     * @returns {string} Random animation type
-     */
-    function getRandomAnimation() {
-        const animations = ['hearts', 'stars', 'confetti', 'bubbles', 'sparkles', 'fireworks'];
-        const randomIndex = Math.floor(Math.random() * animations.length);
-        return animations[randomIndex];
+    function adjustColor(color, percent) {
+        let R = parseInt(color.substring(1, 3), 16);
+        let G = parseInt(color.substring(3, 5), 16);
+        let B = parseInt(color.substring(5, 7), 16);
+
+        R = parseInt(R * (100 + percent) / 100);
+        G = parseInt(G * (100 + percent) / 100);
+        B = parseInt(B * (100 + percent) / 100);
+
+        R = (R < 255) ? R : 255;
+        G = (G < 255) ? G : 255;
+        B = (B < 255) ? B : 255;
+
+        const RR = ((R.toString(16).length === 1) ? "0" + R.toString(16) : R.toString(16));
+        const GG = ((G.toString(16).length === 1) ? "0" + G.toString(16) : G.toString(16));
+        const BB = ((B.toString(16).length === 1) ? "0" + B.toString(16) : B.toString(16));
+
+        return "#" + RR + GG + BB;
     }
 });
-
-/**
- * Adjusts a hex color by the specified percent
- * @param {string} color - The hex color to adjust
- * @param {number} percent - Percent to lighten (positive) or darken (negative)
- * @returns {string} - The adjusted hex color
- */
-function adjustColor(color, percent) {
-    let R = parseInt(color.substring(1, 3), 16);
-    let G = parseInt(color.substring(3, 5), 16);
-    let B = parseInt(color.substring(5, 7), 16);
-
-    R = parseInt(R * (100 + percent) / 100);
-    G = parseInt(G * (100 + percent) / 100);
-    B = parseInt(B * (100 + percent) / 100);
-
-    R = (R < 255) ? R : 255;
-    G = (G < 255) ? G : 255;
-    B = (B < 255) ? B : 255;
-
-    const RR = ((R.toString(16).length === 1) ? "0" + R.toString(16) : R.toString(16));
-    const GG = ((G.toString(16).length === 1) ? "0" + G.toString(16) : G.toString(16));
-    const BB = ((B.toString(16).length === 1) ? "0" + B.toString(16) : B.toString(16));
-
-    return "#" + RR + GG + BB;
-}
 
 /**
  * Check if the media size exceeds recommended limits and show a warning if needed

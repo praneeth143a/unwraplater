@@ -1,0 +1,92 @@
+/* Share section */
+.share-section .link-container {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.social-share-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+/* === Audio Player Styles === */
+.audio-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    background-color: var(--card-bg-color);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    margin: 15px 0;
+    width: 100%;
+    max-width: 320px;
+}
+
+.audio-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    animation: pulse 2s infinite ease-in-out;
+}
+
+.audio-name {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.8;
+    text-align: center;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+audio {
+    width: 100%;
+    margin: 5px 0;
+    border-radius: var(--border-radius-sm);
+}
+
+audio::-webkit-media-controls-panel {
+    background-color: var(--card-bg-color);
+}
+
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-volume-slider,
+audio::-webkit-media-controls-mute-button {
+    color: var(--primary-color);
+}
+
+/* Dark mode adjustments for audio */
+.dark-mode .audio-container {
+    background-color: #2a2a2a;
+}
+
+.dark-mode audio::-webkit-media-controls-panel {
+    background-color: #2a2a2a;
+}
+
+/* Storage limit notification */
+.storage-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    margin-top: var(--spacing-sm);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    animation: fadeIn 0.3s ease;
+    border-left: 4px solid #ffc107;
+}
+
+.theme-option[data-theme="celebration"]::before {
+    background: var(--theme-gradient);
+}
+
+.theme-icon {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-xs);
+    z-index: 1;
+} 
