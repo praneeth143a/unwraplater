@@ -45,23 +45,25 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCurrentDateTime();
     setInterval(updateCurrentDateTime, 1000);
     
-    // Set current date and time for unlock date input
+    /**
+     * Set current date/time in the date input
+     */
     const setCurrentDateTime = () => {
         const now = new Date();
         
-        // Format for datetime-local input (YYYY-MM-DDThh:mm)
+        // Format date as ISO string like 2023-03-15T14:30
+        // This format works with datetime-local input
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         
-        const currentFormatted = `${year}-${month}-${day}T${hours}:${minutes}`;
-        unlockDateInput.value = currentFormatted;
-        unlockDateInput.min = '';  // Remove min date restriction
-    }
+        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+        unlockDateInput.value = formattedDate;
+    };
     
-    // Set the current date/time
+    // Set current date/time on page load
     setCurrentDateTime();
     
     // Add a "Set to Current Time" button next to the date input
@@ -287,216 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
         createSection.classList.add('active-section');
     });
     
-    /**
-     * Simple QR Code Generator (basic implementation)
-     * @param {string} text - Text to encode
-     * @param {HTMLElement} container - Container to append QR code to
-     * @param {Object} options - Options for QR code
-     * @returns {HTMLCanvasElement|null} Canvas element if successful
-     */
-    const generateSimpleQR = (text, container, options = {}) => {
-        if (!text || !container) return null;
-        
-        try {
-            // Clear container
-            container.innerHTML = '';
-            
-            // Default options
-            const opts = {
-                size: options.size || 200,
-                color: options.colorDark || '#000000',
-                bgColor: options.colorLight || '#FFFFFF'
-            };
-            
-            // Create canvas
-            const canvas = document.createElement('canvas');
-            canvas.width = opts.size;
-            canvas.height = opts.size;
-            const ctx = canvas.getContext('2d');
-            
-            // Draw background
-            ctx.fillStyle = opts.bgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Create a simplified pattern (not a real QR code, just for display)
-            ctx.fillStyle = opts.color;
-            
-            // Draw position markers (corners)
-            const markerSize = Math.floor(opts.size * 0.2);
-            
-            // Top-left marker
-            drawPositionMarker(ctx, 0, 0, markerSize, opts.color, opts.bgColor);
-            // Top-right marker
-            drawPositionMarker(ctx, opts.size - markerSize, 0, markerSize, opts.color, opts.bgColor);
-            // Bottom-left marker
-            drawPositionMarker(ctx, 0, opts.size - markerSize, markerSize, opts.color, opts.bgColor);
-            
-            // Generate a pseudo-random pattern based on text
-            const cellSize = Math.floor((opts.size - 2 * markerSize) / 20);
-            const offset = markerSize;
-            
-            // Simple hash for the text
-            let hash = 0;
-            for (let i = 0; i < text.length; i++) {
-                hash = ((hash << 5) - hash) + text.charCodeAt(i);
-                hash = hash & hash;
-            }
-            
-            // Seed random with hash
-            const random = seededRandom(hash);
-            
-            // Fill cells
-            for (let y = 0; y < 20; y++) {
-                for (let x = 0; x < 20; x++) {
-                    // Skip the areas where markers are
-                    if ((x < 7 && y < 7) || (x > 13 && y < 7) || (x < 7 && y > 13)) {
-                        continue;
-                    }
-                    
-                    // 40% chance to fill a cell
-                    if (random() < 0.4) {
-                        ctx.fillRect(
-                            offset + x * cellSize, 
-                            offset + y * cellSize, 
-                            cellSize, 
-                            cellSize
-                        );
-                    }
-                }
-            }
-            
-            // Add canvas to container
-            container.appendChild(canvas);
-            return canvas;
-        } catch (error) {
-            console.error('Error generating simple QR code:', error);
-            return null;
-        }
-    };
-    
-    /**
-     * Draw position marker for QR code
-     * @private
-     */
-    const drawPositionMarker = (ctx, x, y, size, color, bgColor) => {
-        // Outer square
-        ctx.fillStyle = color;
-        ctx.fillRect(x, y, size, size);
-        
-        // Inner square
-        ctx.fillStyle = bgColor;
-        const innerSize = Math.floor(size * 0.7);
-        const innerOffset = Math.floor((size - innerSize) / 2);
-        ctx.fillRect(x + innerOffset, y + innerOffset, innerSize, innerSize);
-        
-        // Center square
-        ctx.fillStyle = color;
-        const centerSize = Math.floor(size * 0.3);
-        const centerOffset = Math.floor((size - centerSize) / 2);
-        ctx.fillRect(x + centerOffset, y + centerOffset, centerSize, centerSize);
-    };
-    
-    /**
-     * Simple seeded random function
-     * @private
-     */
-    const seededRandom = (seed) => {
-        return function() {
-            seed = (seed * 9301 + 49297) % 233280;
-            return seed / 233280;
-        };
-    };
-    
-    /**
-     * Download a canvas as an image
-     * @param {HTMLCanvasElement} canvas - Canvas to download
-     * @param {string} filename - Filename for download
-     */
-    const downloadCanvasAsImage = (canvas, filename) => {
-        if (!canvas) return;
-        
-        try {
-            // Create a temporary link element
-            const link = document.createElement('a');
-            link.download = filename;
-            
-            // Convert canvas to data URL
-            link.href = canvas.toDataURL('image/png');
-            
-            // Trigger download
-            document.body.appendChild(link);
-            link.click();
-            
-            // Clean up
-            setTimeout(() => {
-                document.body.removeChild(link);
-            }, 100);
-        } catch (error) {
-            console.error('Error downloading canvas:', error);
-        }
-    };
-    
-    /**
-     * Generate a scannable QR code using QRCode.js library
-     * @param {string} text - Text to encode in QR code
-     * @param {HTMLElement} container - Container element
-     * @param {Object} options - Options for QR code
-     * @returns {Object} QR code object with download methods
-     */
-    const generateQRCode = (text, container, options = {}) => {
-        if (!text || !container) return null;
-        
-        try {
-            // Clear container
-            container.innerHTML = '';
-            
-            // Default options
-            const opts = {
-                text: text,
-                width: options.size || 200,
-                height: options.size || 200,
-                colorDark: options.colorDark || '#000000',
-                colorLight: options.colorLight || '#FFFFFF',
-                correctLevel: QRCode.CorrectLevel.H // High error correction
-            };
-            
-            // Check if QRCode library is available
-            if (typeof QRCode === 'undefined') {
-                console.error('QRCode library not found, falling back to simple implementation');
-                return generateSimpleQR(text, container, options);
-            }
-            
-            // Create QR code in container
-            const qrcode = new QRCode(container, opts);
-            
-            // Return object with original QR code and methods
-            return {
-                qrcode: qrcode,
-                download: (filename) => {
-                    // Get the canvas or image from the container
-                    const canvas = container.querySelector('canvas');
-                    const image = container.querySelector('img');
-                    
-                    if (canvas) {
-                        // If canvas is available, use it directly
-                        downloadCanvasAsImage(canvas, filename);
-                    } else if (image) {
-                        // If only image is available, create canvas from image
-                        const canvas = document.createElement('canvas');
-                        canvas.width = image.width;
-                        canvas.height = image.height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(image, 0, 0, image.width, image.height);
-                        downloadCanvasAsImage(canvas, filename);
-                    }
-                }
-            };
-        } catch (error) {
-            console.error('Error generating QR code:', error);
-            return null;
-        }
-    };
-    
     // Handle create capsule button
     createCapsuleBtn.addEventListener('click', () => {
         // Stop animations before proceeding
@@ -544,59 +336,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Clear any previous content
                 qrContainer.innerHTML = '';
                 
-                let qrObject = null;
+                let qrCanvas = null;
                 
-                // Try to use the QRCode.js library first
-                if (typeof QRCode !== 'undefined') {
-                    qrObject = generateQRCode(shareLink, qrContainer, {
+                // Use the Helpers.generateQRCode function
+                if (typeof Helpers !== 'undefined' && Helpers.generateQRCode) {
+                    qrCanvas = Helpers.generateQRCode(shareLink, qrContainer, {
                         size: 200,
-                        colorDark: '#8e44ad'
+                        colorDark: '#8e44ad',
+                        colorLight: '#FFFFFF'
                     });
-                } 
-                // Then try Helpers if available
-                else if (typeof Helpers !== 'undefined' && Helpers.generateQRCode) {
-                    const qrCanvas = Helpers.generateQRCode(shareLink, qrContainer, {
-                        size: 200,
-                        colorDark: '#8e44ad'
-                    });
-                    qrObject = {
-                        download: (filename) => {
-                            if (typeof Helpers.downloadCanvas === 'function') {
-                                Helpers.downloadCanvas(qrCanvas, filename);
-                            } else {
-                                downloadCanvasAsImage(qrCanvas, filename);
-                            }
-                        }
-                    };
-                } 
-                // Fall back to simple implementation
-                else {
-                    const qrCanvas = generateSimpleQR(shareLink, qrContainer, {
-                        size: 200,
-                        colorDark: '#8e44ad'
-                    });
-                    qrObject = {
-                        download: (filename) => {
-                            downloadCanvasAsImage(qrCanvas, filename);
-                        }
-                    };
-                }
-                
-                // Setup download QR code button
-                const downloadQrBtn = document.getElementById('download-qr');
-                if (downloadQrBtn) {
-                    // Remove any existing event listeners
-                    const newDownloadBtn = downloadQrBtn.cloneNode(true);
-                    downloadQrBtn.parentNode.replaceChild(newDownloadBtn, downloadQrBtn);
                     
-                    if (qrObject) {
+                    // Setup download QR code button
+                    const downloadQrBtn = document.getElementById('download-qr');
+                    if (downloadQrBtn && qrCanvas) {
+                        // Remove any existing event listeners
+                        const newDownloadBtn = downloadQrBtn.cloneNode(true);
+                        downloadQrBtn.parentNode.replaceChild(newDownloadBtn, downloadQrBtn);
+                        
                         // Add event listener for download
                         newDownloadBtn.addEventListener('click', () => {
-                            qrObject.download(`unwraplater-qr-${capsule.id}.png`);
+                            Helpers.downloadCanvas(qrCanvas, `unwraplater-qr-${capsule.id}.png`);
                         });
-                    } else {
-                        // Hide or disable the download button if no QR is available
-                        newDownloadBtn.style.display = 'none';
+                    }
+                } else {
+                    console.error('QR code generation function not available');
+                    // Fallback message
+                    qrContainer.innerHTML = '<p>QR code generation is not available</p>';
+                    
+                    // Hide download button
+                    const downloadQrBtn = document.getElementById('download-qr');
+                    if (downloadQrBtn) {
+                        downloadQrBtn.style.display = 'none';
                     }
                 }
             } else {
@@ -645,6 +415,37 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Show copied notification
         alert('Link copied to clipboard!');
+    });
+    
+    // Download capsule button
+    document.getElementById('download-capsule').addEventListener('click', () => {
+        // Get the capsule ID from the link
+        const linkInput = document.getElementById('capsule-link');
+        const url = new URL(linkInput.value);
+        const capsuleId = url.searchParams.get('capsule');
+        
+        if (capsuleId) {
+            // Get the capsule data
+            const capsule = StorageUtil.getCapsule(capsuleId);
+            const capsuleMedia = StorageUtil.getMedia(capsuleId);
+            
+            if (capsule) {
+                // Generate a readable, SEO-friendly filename
+                const date = new Date();
+                const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+                const filename = `unwraplater-capsule-${formattedDate}.html`;
+                
+                // Generate the memory HTML content
+                const htmlContent = Helpers.generateMemoryFile(capsule, capsuleMedia, capsule.theme);
+                
+                // Download the file
+                Helpers.downloadFile(htmlContent, filename, 'text/html');
+            } else {
+                alert('Capsule not found in storage.');
+            }
+        } else {
+            alert('Could not find capsule ID in the share link.');
+        }
     });
     
     // Form validation
@@ -929,4 +730,310 @@ document.addEventListener('DOMContentLoaded', () => {
             return true;
         }
     }
+    
+    // Custom theme handling
+    const customThemeOption = document.querySelector('.theme-option[data-theme="custom"]');
+    const customThemeOptions = document.getElementById('custom-theme-options');
+    const customColorPicker = document.getElementById('custom-color');
+    const customThemePreview = document.querySelector('.custom-theme-preview');
+    const customAnimationSelect = document.getElementById('custom-animation');
+    
+    if (customThemeOption && customThemeOptions) {
+        // Hide custom options initially
+        customThemeOptions.style.display = 'none';
+        
+        // Show custom options when custom theme is selected
+        customThemeOption.addEventListener('click', () => {
+            setTimeout(() => {
+                customThemeOptions.style.display = 'block';
+            }, 150);
+        });
+        
+        // Hide custom options when other themes are selected
+        document.querySelectorAll('.theme-option:not([data-theme="custom"])').forEach(option => {
+            option.addEventListener('click', () => {
+                customThemeOptions.style.display = 'none';
+            });
+        });
+        
+        // Update custom theme preview when color is changed
+        if (customColorPicker) {
+            customColorPicker.addEventListener('input', (e) => {
+                const color = e.target.value;
+                customThemePreview.style.background = `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, 20)} 100%)`;
+            });
+            
+            // Initialize with a default color
+            customColorPicker.value = '#8e44ad';
+            customThemePreview.style.background = 'linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%)';
+        }
+    }
 });
+
+/**
+ * Adjusts a hex color by the specified percent
+ * @param {string} color - The hex color to adjust
+ * @param {number} percent - Percent to lighten (positive) or darken (negative)
+ * @returns {string} - The adjusted hex color
+ */
+function adjustColor(color, percent) {
+    let R = parseInt(color.substring(1, 3), 16);
+    let G = parseInt(color.substring(3, 5), 16);
+    let B = parseInt(color.substring(5, 7), 16);
+
+    R = parseInt(R * (100 + percent) / 100);
+    G = parseInt(G * (100 + percent) / 100);
+    B = parseInt(B * (100 + percent) / 100);
+
+    R = (R < 255) ? R : 255;
+    G = (G < 255) ? G : 255;
+    B = (B < 255) ? B : 255;
+
+    const RR = ((R.toString(16).length === 1) ? "0" + R.toString(16) : R.toString(16));
+    const GG = ((G.toString(16).length === 1) ? "0" + G.toString(16) : G.toString(16));
+    const BB = ((B.toString(16).length === 1) ? "0" + B.toString(16) : B.toString(16));
+
+    return "#" + RR + GG + BB;
+}
+
+/**
+ * Check if the media size exceeds recommended limits and show a warning if needed
+ * @param {number} mediaSize - Size of the media in bytes
+ */
+function checkStorageLimit(mediaSize) {
+    const MAX_RECOMMENDED_SIZE = 5 * 1024 * 1024; // 5MB
+    
+    if (mediaSize > MAX_RECOMMENDED_SIZE) {
+        const container = document.querySelector('.media-upload-container');
+        
+        // Create warning element if it doesn't exist
+        if (!document.querySelector('.storage-warning')) {
+            const warningEl = document.createElement('div');
+            warningEl.className = 'storage-warning';
+            warningEl.innerHTML = `
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-message">
+                    <p>The media you've attached is large (${formatFileSize(mediaSize)}) and may consume significant storage space.</p>
+                    <button class="optimize-btn">Optimize Media</button>
+                </div>
+            `;
+            
+            // Add optimize media handler
+            setTimeout(() => {
+                const optimizeBtn = warningEl.querySelector('.optimize-btn');
+                if (optimizeBtn) {
+                    optimizeBtn.addEventListener('click', optimizeMedia);
+                }
+            }, 0);
+            
+            // Insert warning after the media container
+            container.parentNode.insertBefore(warningEl, container.nextSibling);
+        }
+    }
+}
+
+/**
+ * Optimize media by compressing images and reducing quality
+ */
+function optimizeMedia() {
+    const mediaInput = document.getElementById('media-upload');
+    const files = mediaInput.files;
+    
+    if (files && files.length > 0) {
+        // Create an optimized file list
+        const optimizedFiles = new DataTransfer();
+        
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+                // Compress images
+                compressImage(file).then(compressedFile => {
+                    optimizedFiles.items.add(compressedFile);
+                    updateMediaPreview(optimizedFiles.files);
+                });
+            } else {
+                // Keep non-image files as is
+                optimizedFiles.items.add(file);
+            }
+        });
+        
+        // Remove the warning message
+        const warningEl = document.querySelector('.storage-warning');
+        if (warningEl) {
+            warningEl.remove();
+        }
+    }
+}
+
+/**
+ * Compress an image file to reduce its size
+ * @param {File} imageFile - The image file to compress
+ * @returns {Promise<File>} - Promise resolving to the compressed file
+ */
+function compressImage(imageFile) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imageFile);
+        
+        reader.onload = event => {
+            const img = new Image();
+            img.src = event.target.result;
+            
+            img.onload = () => {
+                // Create a canvas to draw the compressed image
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Set max dimensions (reduce if large)
+                const MAX_WIDTH = 1200;
+                const MAX_HEIGHT = 1200;
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                
+                // Set canvas dimensions
+                canvas.width = width;
+                canvas.height = height;
+                
+                // Draw the image on the canvas
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Convert to blob with reduced quality
+                canvas.toBlob(blob => {
+                    // Create a new File from the blob
+                    const compressedFile = new File([blob], imageFile.name, {
+                        type: 'image/jpeg',
+                        lastModified: new Date().getTime()
+                    });
+                    
+                    // Show compression results
+                    console.log(`Compressed ${imageFile.name} from ${formatFileSize(imageFile.size)} to ${formatFileSize(compressedFile.size)}`);
+                    
+                    resolve(compressedFile);
+                }, 'image/jpeg', 0.7); // 70% quality
+            };
+        };
+    });
+}
+
+/**
+ * Asynchronously encrypt a password using Web Crypto API
+ * @param {string} password - The password to encrypt
+ * @returns {Promise<string>} - Promise resolving to encrypted password
+ */
+async function encryptPassword(password) {
+    // Convert password string to ArrayBuffer
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    
+    // Generate a secure salt
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    
+    // Derive a key using PBKDF2
+    const keyMaterial = await window.crypto.subtle.importKey(
+        "raw",
+        data,
+        { name: "PBKDF2" },
+        false,
+        ["deriveBits", "deriveKey"]
+    );
+    
+    const key = await window.crypto.subtle.deriveKey(
+        {
+            name: "PBKDF2",
+            salt: salt,
+            iterations: 100000,
+            hash: "SHA-256"
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt"]
+    );
+    
+    // Store the salt and key for later verification
+    const saltBase64 = btoa(String.fromCharCode(...salt));
+    const exportedKey = await window.crypto.subtle.exportKey("raw", key);
+    const keyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedKey)));
+    
+    return JSON.stringify({ salt: saltBase64, key: keyBase64 });
+}
+
+/**
+ * Verify a password against the stored encrypted password
+ * @param {string} inputPassword - The password to verify
+ * @param {string} storedPassword - The stored encrypted password
+ * @returns {Promise<boolean>} - Promise resolving to whether the password is correct
+ */
+async function verifyPassword(inputPassword, storedPassword) {
+    try {
+        const { salt: saltBase64, key: keyBase64 } = JSON.parse(storedPassword);
+        
+        // Decode the stored salt and key
+        const saltString = atob(saltBase64);
+        const salt = new Uint8Array(saltString.length);
+        for (let i = 0; i < saltString.length; i++) {
+            salt[i] = saltString.charCodeAt(i);
+        }
+        
+        const keyString = atob(keyBase64);
+        const storedKeyData = new Uint8Array(keyString.length);
+        for (let i = 0; i < keyString.length; i++) {
+            storedKeyData[i] = keyString.charCodeAt(i);
+        }
+        
+        // Derive a key from the input password using the same parameters
+        const encoder = new TextEncoder();
+        const inputData = encoder.encode(inputPassword);
+        
+        const keyMaterial = await window.crypto.subtle.importKey(
+            "raw",
+            inputData,
+            { name: "PBKDF2" },
+            false,
+            ["deriveBits", "deriveKey"]
+        );
+        
+        const derivedKey = await window.crypto.subtle.deriveKey(
+            {
+                name: "PBKDF2",
+                salt: salt,
+                iterations: 100000,
+                hash: "SHA-256"
+            },
+            keyMaterial,
+            { name: "AES-GCM", length: 256 },
+            true,
+            ["encrypt"]
+        );
+        
+        const derivedKeyData = await window.crypto.subtle.exportKey("raw", derivedKey);
+        const derivedKeyArray = new Uint8Array(derivedKeyData);
+        
+        // Compare the derived key with the stored key
+        if (derivedKeyArray.length !== storedKeyData.length) {
+            return false;
+        }
+        
+        for (let i = 0; i < derivedKeyArray.length; i++) {
+            if (derivedKeyArray[i] !== storedKeyData[i]) {
+                return false;
+            }
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Password verification error:', error);
+        return false;
+    }
+}
