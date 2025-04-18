@@ -670,11 +670,11 @@ button {
 
 .any-btn {
     background: linear-gradient(135deg, #8345a9 0%, #3498db 100%);
-    width: 100%;
-    max-width: 250px;
-    margin: 0 auto;
-    padding: var(--spacing-md) var(--spacing-lg);
-    font-size: 1.1rem;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: var(--spacing-md);
+    font-size: 1rem;
 }
 
 #qr-code {

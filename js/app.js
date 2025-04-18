@@ -438,6 +438,47 @@ document.addEventListener('DOMContentLoaded', () => {
         const shareTitle = 'Check out my UnwrapLater time capsule!';
         const shareText = `${shareTitle} It will unlock on ${new Date(capsule.unlockDate).toLocaleDateString()}. Click the link to view!`;
         
+        // WhatsApp Share
+        const whatsappBtn = document.getElementById('share-whatsapp');
+        if (whatsappBtn) {
+            whatsappBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
+                window.open(whatsappUrl, '_blank');
+            });
+        }
+        
+        // Facebook Share
+        const facebookBtn = document.getElementById('share-facebook');
+        if (facebookBtn) {
+            facebookBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+                window.open(facebookUrl, '_blank');
+            });
+        }
+        
+        // Twitter Share
+        const twitterBtn = document.getElementById('share-twitter');
+        if (twitterBtn) {
+            twitterBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+                window.open(twitterUrl, '_blank');
+            });
+        }
+        
+        // Email Share
+        const emailBtn = document.getElementById('share-email');
+        if (emailBtn) {
+            emailBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const subject = encodeURIComponent(shareTitle);
+                const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
+                window.location.href = `mailto:?subject=${subject}&body=${body}`;
+            });
+        }
+        
         // Share to Any App button using Web Share API
         const shareAnyBtn = document.getElementById('share-any');
         if (shareAnyBtn) {
