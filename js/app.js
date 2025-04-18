@@ -1442,63 +1442,21 @@ async function encryptPassword(password) {
  */
 async function verifyPassword(inputPassword, storedPassword) {
     try {
-        const { salt: saltBase64, key: keyBase64 } = JSON.parse(storedPassword);
+        // Split stored password into parts
+        const [salt, hash] = storedPassword.split('.');
         
-        // Decode the stored salt and key
-        const saltString = atob(saltBase64);
-        const salt = new Uint8Array(saltString.length);
-        for (let i = 0; i < saltString.length; i++) {
-            salt[i] = saltString.charCodeAt(i);
-        }
+        // Create same hash from input password
+        const inputHash = await encryptPassword(inputPassword + salt);
         
-        const keyString = atob(keyBase64);
-        const storedKeyData = new Uint8Array(keyString.length);
-        for (let i = 0; i < keyString.length; i++) {
-            storedKeyData[i] = keyString.charCodeAt(i);
-        }
-        
-        // Derive a key from the input password using the same parameters
-        const encoder = new TextEncoder();
-        const inputData = encoder.encode(inputPassword);
-        
-        const keyMaterial = await window.crypto.subtle.importKey(
-            "raw",
-            inputData,
-            { name: "PBKDF2" },
-            false,
-            ["deriveBits", "deriveKey"]
-        );
-        
-        const derivedKey = await window.crypto.subtle.deriveKey(
-            {
-                name: "PBKDF2",
-                salt: salt,
-                iterations: 100000,
-                hash: "SHA-256"
-            },
-            keyMaterial,
-            { name: "AES-GCM", length: 256 },
-            true,
-            ["encrypt"]
-        );
-        
-        const derivedKeyData = await window.crypto.subtle.exportKey("raw", derivedKey);
-        const derivedKeyArray = new Uint8Array(derivedKeyData);
-        
-        // Compare the derived key with the stored key
-        if (derivedKeyArray.length !== storedKeyData.length) {
-            return false;
-        }
-        
-        for (let i = 0; i < derivedKeyArray.length; i++) {
-            if (derivedKeyArray[i] !== storedKeyData[i]) {
-                return false;
-            }
-        }
-        
-        return true;
+        // Compare hashes
+        return inputHash === storedPassword;
     } catch (error) {
         console.error('Password verification error:', error);
         return false;
     }
 }
+
+// Add DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', () => {
+    // Any initialization code can go here
+});

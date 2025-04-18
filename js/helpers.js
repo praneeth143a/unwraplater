@@ -539,10 +539,9 @@ const Helpers = (() => {
      * @param {string} filename - Name for the downloaded file
      */
     const downloadCanvas = (canvas, filename) => {
-        const dataURL = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.download = filename;
-        link.href = dataURL;
+        link.href = canvas.toDataURL('image/png');
         link.click();
     };
     

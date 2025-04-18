@@ -9,7 +9,6 @@ A time capsule web application that allows users to create messages that can be 
 - Add optional passphrase protection for extra security
 - Select from various themes with animated effects
 - Attach images or audio recordings to your capsule
-- Generate QR codes for easily sharing capsules
 - Dark mode support
 
 ## How to Use
@@ -20,13 +19,12 @@ A time capsule web application that allows users to create messages that can be 
 4. Choose a theme for your capsule
 5. Attach media (image or audio) (optional)
 6. Preview and create your capsule
-7. Share the link or QR code with the recipient
+7. Share the link with the recipient
 
 ## Technologies Used
 
 - HTML5, CSS3, JavaScript
 - Local Storage for client-side data persistence
-- QRCode.js for generating scannable QR codes
 - Canvas API for animations and effects
 - Web Audio API for audio visualization
 
@@ -46,7 +44,7 @@ npx http-server
 
 - Create page: Where users can compose their time capsule messages
 - Preview page: Shows how the capsule will look when opened
-- Share page: Provides link and QR code for sharing the capsule
+- Share page: Provides link for sharing the capsule
 - Unlock page: Where recipients can view the time capsule message
 
 ## License

@@ -529,39 +529,6 @@ const UIHelper = (() => {
     };
     
     /**
-     * Generate QR code for a URL
-     * @param {string} url - URL to encode
-     * @param {HTMLElement} container - Container to display QR code
-     * @param {number} size - Size of QR code in pixels
-     */
-    const generateQRCode = (url, container, size = 200) => {
-        if (!container) return;
-        
-        // Clear container
-        container.innerHTML = '';
-        
-        // Check if QRCode library is available
-        if (typeof QRCode !== 'undefined') {
-            new QRCode(container, {
-                text: url,
-                width: size,
-                height: size,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        } else {
-            // Fallback: display the URL and a message
-            container.innerHTML = `
-                <div class="qr-fallback">
-                    <p>QR Code generation is not available</p>
-                    <a href="${url}" target="_blank">${url}</a>
-                </div>
-            `;
-        }
-    };
-    
-    /**
      * Generate a share link display
      * @param {string} url - URL to share
      * @param {HTMLElement} container - Container for link display
@@ -719,7 +686,6 @@ const UIHelper = (() => {
         showToast,
         renderUnlockMessage,
         showUnlockedMessage,
-        generateQRCode,
         generateShareLink,
         setupFormValidation,
         
