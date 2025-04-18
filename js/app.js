@@ -1088,11 +1088,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Open a capsule from local storage by ID
     function openCapsule(capsuleId) {
-        // Get capsule from storage
-        const capsule = StorageUtil.getCapsule(capsuleId);
+        // Get capsule from persistent storage (tries local storage first, then URL)
+        const capsule = PersistentCapsuleStorage.getCapsule(capsuleId);
         
         if (!capsule) {
-            alert('Capsule not found!');
+            alert('Capsule not found! It may have been deleted or expired.');
             return;
         }
         
@@ -1211,6 +1211,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Open capsule using data directly from the URL
     function openCapsuleFromURLData(capsuleData) {
+        // Ensure the capsule data is saved for future access
+        if (capsuleData.id) {
+            PersistentCapsuleStorage.persistCapsuleData(capsuleData);
+        }
+        
         // Hide all sections and show unlock section
         document.querySelectorAll('section').forEach(section => {
             section.classList.remove('active-section');
