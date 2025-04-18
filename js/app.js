@@ -197,6 +197,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     audioContainer.appendChild(audio);
                     audioContainer.appendChild(audioName);
                     mediaPreview.appendChild(audioContainer);
+                } else if (file.type.startsWith('video/')) {
+                    const videoContainer = document.createElement('div');
+                    videoContainer.className = 'video-container';
+                    
+                    const video = document.createElement('video');
+                    video.src = URL.createObjectURL(file);
+                    video.controls = true;
+                    video.autoplay = false;
+                    video.muted = true;
+                    video.className = 'video-preview';
+                    
+                    const videoName = document.createElement('div');
+                    videoName.className = 'video-name';
+                    videoName.textContent = file.name;
+                    
+                    videoContainer.appendChild(video);
+                    videoContainer.appendChild(videoName);
+                    mediaPreview.appendChild(videoContainer);
                 }
             };
             
@@ -309,6 +327,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 audioContainer.appendChild(audio);
                 audioContainer.appendChild(audioName);
                 previewMediaContainer.appendChild(audioContainer);
+            } else if (currentMediaFile.type.startsWith('video/')) {
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'video-container';
+                
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(currentMediaFile);
+                video.controls = true;
+                video.autoplay = false;
+                video.muted = true;
+                video.className = 'video-preview';
+                
+                const videoName = document.createElement('div');
+                videoName.className = 'video-name';
+                videoName.textContent = currentMediaFile.name;
+                
+                videoContainer.appendChild(video);
+                videoContainer.appendChild(videoName);
+                previewMediaContainer.appendChild(videoContainer);
             }
         }
         
@@ -984,6 +1020,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         audioContainer.appendChild(audio);
                         mediaReveal.appendChild(audioContainer);
+                    } else if (capsuleMedia.type.startsWith('video/')) {
+                        const videoContainer = document.createElement('div');
+                        videoContainer.className = 'video-container';
+                        
+                        const video = document.createElement('video');
+                        video.src = capsuleMedia.data;
+                        video.controls = true;
+                        video.autoplay = false;
+                        video.muted = true;
+                        video.className = 'video-preview';
+                        
+                        const videoName = document.createElement('div');
+                        videoName.className = 'video-name';
+                        videoName.textContent = capsuleMedia.name;
+                        
+                        videoContainer.appendChild(video);
+                        videoContainer.appendChild(videoName);
+                        mediaReveal.appendChild(videoContainer);
                     }
                 }
             }
@@ -1377,6 +1431,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 audioContainer.appendChild(audio);
                 audioContainer.appendChild(audioName);
                 mediaReveal.appendChild(audioContainer);
+            } else if (capsuleMedia.type.startsWith('video/')) {
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'video-container';
+                
+                const video = document.createElement('video');
+                video.src = capsuleMedia.data;
+                video.controls = true;
+                video.autoplay = false;
+                video.muted = true;
+                video.className = 'video-preview';
+                
+                const videoName = document.createElement('div');
+                videoName.className = 'video-name';
+                videoName.textContent = capsuleMedia.name;
+                
+                videoContainer.appendChild(video);
+                videoContainer.appendChild(videoName);
+                mediaReveal.appendChild(videoContainer);
             }
         }
         
