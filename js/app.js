@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
             : capsule.message;
         
         const shareTitle = 'Check out my UnwrapLater time capsule!';
-        const shareText = `${shareTitle} It will unlock on ${new Date(capsule.unlockDate).toLocaleDateString()}`;
+        const shareText = `${shareTitle} It will unlock on ${new Date(capsule.unlockDate).toLocaleDateString()}. ⚠️ Note: Download the HTML file from me to view the capsule (link alone won't work).`;
         
         // WhatsApp Share
         const whatsappBtn = document.getElementById('share-whatsapp');
@@ -423,6 +423,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
                 window.open(whatsappUrl, '_blank');
+                
+                // Show reminder to share the downloaded file
+                setTimeout(() => {
+                    alert('Remember: After sharing this message, you still need to download the capsule file and send it to the recipient!');
+                }, 1000);
             });
         }
         
@@ -433,6 +438,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
                 window.open(facebookUrl, '_blank');
+                
+                // Show reminder to share the downloaded file
+                setTimeout(() => {
+                    alert('Remember: After sharing this post, you still need to download the capsule file and send it to the recipient!');
+                }, 1000);
             });
         }
         
@@ -443,6 +453,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
                 window.open(twitterUrl, '_blank');
+                
+                // Show reminder to share the downloaded file
+                setTimeout(() => {
+                    alert('Remember: After sharing this tweet, you still need to download the capsule file and send it to the recipient!');
+                }, 1000);
             });
         }
         
@@ -452,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
             emailBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 const subject = encodeURIComponent(shareTitle);
-                const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
+                const body = encodeURIComponent(`${shareText}\n\n${shareUrl}\n\nIMPORTANT: I will send you the capsule HTML file separately. The link alone won't work for you.`);
                 window.location.href = `mailto:?subject=${subject}&body=${body}`;
             });
         }
@@ -462,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (smsBtn) {
             smsBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                const smsText = encodeURIComponent(`${shareText} ${shareUrl}`);
+                const smsText = encodeURIComponent(`${shareText} ${shareUrl} (I'll send you the HTML file separately)`);
                 window.location.href = `sms:?body=${smsText}`;
             });
         }
@@ -498,8 +513,8 @@ document.addEventListener('DOMContentLoaded', () => {
         linkInput.select();
         document.execCommand('copy');
         
-        // Show copied notification
-        alert('Link copied to clipboard!\n\nNote: To make your capsule accessible from any device, please use the "Download Capsule" button and share that file instead.');
+        // Show copied notification with clearer warning
+        alert('Link copied to clipboard!\n\nIMPORTANT: This link will ONLY work on your device. To share with others, you MUST use the "Download Capsule" button below and share that file instead.');
     });
     
     // Download capsule button
@@ -527,7 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 Helpers.downloadFile(htmlContent, filename, 'text/html');
                 
                 // Show success message
-                alert('Capsule downloaded successfully! You can share this file with anyone, and it will work on any device.');
+                alert('Capsule downloaded successfully! Share this file with the recipient for them to view on any device.');
             } else {
                 alert('Capsule not found in storage.');
             }

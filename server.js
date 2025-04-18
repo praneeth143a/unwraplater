@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const url = require('url');
 
 const PORT = 3000;
 const MIME_TYPES = {
@@ -19,9 +20,17 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   console.log(`${req.method} ${req.url}`);
   
-  // Handle root URL
-  let filePath = req.url === '/' ? 'index.html' : req.url;
-  filePath = path.join(__dirname, filePath);
+  // Parse the URL
+  const parsedUrl = url.parse(req.url, true);
+  const pathname = parsedUrl.pathname;
+  
+  // Handle root URL or capsule parameter
+  let filePath;
+  if (pathname === '/' || pathname === '/index.html' || pathname === '') {
+    filePath = path.join(__dirname, 'index.html');
+  } else {
+    filePath = path.join(__dirname, pathname);
+  }
   
   // Get file extension
   const extname = path.extname(filePath).toLowerCase();
@@ -31,9 +40,22 @@ const server = http.createServer((req, res) => {
   fs.readFile(filePath, (err, content) => {
     if (err) {
       if (err.code === 'ENOENT') {
-        // File not found
-        res.writeHead(404);
-        res.end('404 - File Not Found');
+        // If path not found but has capsule parameter, serve index.html
+        if (parsedUrl.query.capsule) {
+          fs.readFile(path.join(__dirname, 'index.html'), (indexErr, indexContent) => {
+            if (indexErr) {
+              res.writeHead(404);
+              res.end('404 - File Not Found');
+            } else {
+              res.writeHead(200, { 'Content-Type': 'text/html' });
+              res.end(indexContent, 'utf-8');
+            }
+          });
+        } else {
+          // File not found
+          res.writeHead(404);
+          res.end('404 - File Not Found');
+        }
       } else {
         // Server error
         res.writeHead(500);

@@ -533,6 +533,40 @@ button {
     margin-bottom: var(--spacing-lg);
 }
 
+.sharing-warning {
+    background-color: #fff3cd;
+    border: 2px solid #f0ad4e;
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+    color: #856404;
+}
+
+.sharing-warning strong {
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    color: #dc3545;
+}
+
+.sharing-warning p {
+    margin: var(--spacing-xs) 0;
+}
+
+.download-container {
+    text-align: center;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
+.download-container p {
+    margin-bottom: var(--spacing-md);
+    font-size: 1.1rem;
+    color: #dc3545;
+}
+
 .link-container {
     display: flex;
     margin: var(--spacing-md) 0;
@@ -615,14 +649,6 @@ button {
 
 .sms-btn {
     background-color: #7BC62E;
-}
-
-.download-container {
-    margin-top: var(--spacing-lg);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-md);
 }
 
 #qr-code {
