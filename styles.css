@@ -543,6 +543,16 @@ button {
     color: #856404;
 }
 
+.sharing-info {
+    background-color: #d4edda;
+    border: 2px solid #28a745;
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+    color: #155724;
+}
+
 .sharing-warning strong {
     font-size: 1.1rem;
     display: block;
@@ -550,7 +560,14 @@ button {
     color: #dc3545;
 }
 
-.sharing-warning p {
+.sharing-info strong {
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    color: #28a745;
+}
+
+.sharing-warning p, .sharing-info p {
     margin: var(--spacing-xs) 0;
 }
 

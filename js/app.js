@@ -383,10 +383,32 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
-        // Generate share link with absolute URL
-        // Uses the GitHub Pages URL or falls back to the current location
-        const baseUrl = "https://praneeth143a.github.io/unwraplater/";
-        const shareLink = `${baseUrl}?capsule=${capsule.id}`;
+        // Generate share link with capsule data embedded in URL
+        const baseUrl = window.location.origin + window.location.pathname;
+        
+        // Create a sharable data object containing essential capsule data
+        const shareableData = {
+            id: capsule.id,
+            message: capsule.message,
+            theme: capsule.theme,
+            customAnimation: capsule.customAnimation,
+            customColor: capsule.customColor,
+            unlockDate: capsule.unlockDate,
+            hasPassphrase: capsule.hasPassphrase,
+            passphrase: capsule.passphrase
+        };
+        
+        // Add media data if it's available (but be careful about size)
+        if (currentMediaFile) {
+            // For immediate sharing, include a flag that media exists
+            shareableData.hasMedia = true;
+        }
+        
+        // Encode the data to base64
+        const encodedData = btoa(encodeURIComponent(JSON.stringify(shareableData)));
+        
+        // Create the sharing URL with encoded data
+        const shareLink = `${baseUrl}?data=${encodedData}`;
         
         // Set the link input value
         const linkInput = document.getElementById('capsule-link');
@@ -414,7 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
             : capsule.message;
         
         const shareTitle = 'Check out my UnwrapLater time capsule!';
-        const shareText = `${shareTitle} It will unlock on ${new Date(capsule.unlockDate).toLocaleDateString()}. ⚠️ Note: Download the HTML file from me to view the capsule (link alone won't work).`;
+        const shareText = `${shareTitle} It will unlock on ${new Date(capsule.unlockDate).toLocaleDateString()}. Click the link to view!`;
         
         // WhatsApp Share
         const whatsappBtn = document.getElementById('share-whatsapp');
@@ -423,11 +445,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
                 window.open(whatsappUrl, '_blank');
-                
-                // Show reminder to share the downloaded file
-                setTimeout(() => {
-                    alert('Remember: After sharing this message, you still need to download the capsule file and send it to the recipient!');
-                }, 1000);
             });
         }
         
@@ -438,11 +455,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
                 window.open(facebookUrl, '_blank');
-                
-                // Show reminder to share the downloaded file
-                setTimeout(() => {
-                    alert('Remember: After sharing this post, you still need to download the capsule file and send it to the recipient!');
-                }, 1000);
             });
         }
         
@@ -453,11 +465,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
                 window.open(twitterUrl, '_blank');
-                
-                // Show reminder to share the downloaded file
-                setTimeout(() => {
-                    alert('Remember: After sharing this tweet, you still need to download the capsule file and send it to the recipient!');
-                }, 1000);
             });
         }
         
@@ -467,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
             emailBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 const subject = encodeURIComponent(shareTitle);
-                const body = encodeURIComponent(`${shareText}\n\n${shareUrl}\n\nIMPORTANT: I will send you the capsule HTML file separately. The link alone won't work for you.`);
+                const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
                 window.location.href = `mailto:?subject=${subject}&body=${body}`;
             });
         }
@@ -477,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (smsBtn) {
             smsBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                const smsText = encodeURIComponent(`${shareText} ${shareUrl} (I'll send you the HTML file separately)`);
+                const smsText = encodeURIComponent(`${shareText} ${shareUrl}`);
                 window.location.href = `sms:?body=${smsText}`;
             });
         }
@@ -513,8 +520,8 @@ document.addEventListener('DOMContentLoaded', () => {
         linkInput.select();
         document.execCommand('copy');
         
-        // Show copied notification with clearer warning
-        alert('Link copied to clipboard!\n\nIMPORTANT: This link will ONLY work on your device. To share with others, you MUST use the "Download Capsule" button below and share that file instead.');
+        // Show copied notification with clearer message
+        alert('Link copied to clipboard! Share it with anyone to let them view your time capsule.');
     });
     
     // Download capsule button
@@ -1002,17 +1009,7 @@ document.addEventListener('DOMContentLoaded', () => {
         element.parentNode.appendChild(errorDiv);
     }
     
-    // Check URL for capsule parameter
-    function checkUrlForCapsule() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const capsuleId = urlParams.get('capsule');
-        
-        if (capsuleId) {
-            openCapsule(capsuleId);
-        }
-    }
-    
-    // Open a capsule
+    // Open a capsule from local storage by ID
     function openCapsule(capsuleId) {
         // Get capsule from storage
         const capsule = StorageUtil.getCapsule(capsuleId);
@@ -1105,6 +1102,172 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 1000);
         }
+    }
+    
+    // Check URL for capsule parameter
+    function checkUrlForCapsule() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // First check for encoded data parameter
+        const encodedData = urlParams.get('data');
+        if (encodedData) {
+            try {
+                // Decode the base64 data
+                const decodedData = decodeURIComponent(atob(encodedData));
+                const capsuleData = JSON.parse(decodedData);
+                
+                // Open the capsule from the URL data
+                openCapsuleFromURLData(capsuleData);
+                return;
+            } catch (error) {
+                console.error('Error decoding capsule data from URL:', error);
+                alert('This capsule link appears to be invalid or corrupted.');
+            }
+        }
+        
+        // Fallback to check for regular capsule ID (for backward compatibility)
+        const capsuleId = urlParams.get('capsule');
+        if (capsuleId) {
+            openCapsule(capsuleId);
+        }
+    }
+    
+    // Open capsule using data directly from the URL
+    function openCapsuleFromURLData(capsuleData) {
+        // Hide all sections and show unlock section
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.remove('active-section');
+            section.classList.add('hidden-section');
+        });
+        
+        unlockSection.classList.remove('hidden-section');
+        unlockSection.classList.add('active-section');
+        
+        // Set unlock date display
+        const unlockDate = new Date(capsuleData.unlockDate);
+        document.getElementById('unlock-date-display').textContent = new Intl.DateTimeFormat(navigator.language, {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            timeZoneName: 'short'
+        }).format(unlockDate);
+        
+        // Set up unlock now button event
+        document.getElementById('unlock-now').addEventListener('click', () => {
+            if (capsuleData.hasPassphrase) {
+                document.getElementById('passphrase-container').classList.remove('hidden');
+                document.getElementById('unlock-now-container').classList.add('hidden');
+            } else {
+                unlockCapsuleFromURLData(capsuleData);
+            }
+        });
+        
+        // Check if the capsule can be unlocked
+        const now = new Date();
+        
+        // Compare current date with unlock date
+        const canUnlock = now >= unlockDate;
+        
+        if (canUnlock) {
+            // If passphrase is required, show input
+            if (capsuleData.hasPassphrase) {
+                document.getElementById('passphrase-container').classList.remove('hidden');
+                document.getElementById('time-remaining').classList.add('hidden');
+                
+                // Set up passphrase validation
+                document.getElementById('submit-passphrase').addEventListener('click', () => {
+                    const enteredPassphrase = document.getElementById('enter-passphrase').value;
+                    
+                    // Use our decryption utility to verify passphrase
+                    const isValid = CryptoUtil.decrypt(capsuleData.passphrase, enteredPassphrase) !== null;
+                    
+                    if (enteredPassphrase && isValid) {
+                        unlockCapsuleFromURLData(capsuleData);
+                    } else {
+                        document.getElementById('passphrase-error').classList.remove('hidden');
+                    }
+                });
+            } else {
+                // No passphrase, unlock immediately
+                unlockCapsuleFromURLData(capsuleData);
+            }
+        } else {
+            // Show countdown
+            document.getElementById('passphrase-container').classList.add('hidden');
+            document.getElementById('time-remaining').classList.remove('hidden');
+            
+            // Update countdown
+            updateCountdown(unlockDate);
+            // Set interval to update countdown
+            const countdownInterval = setInterval(() => {
+                // Return value indicates if countdown is finished
+                const isFinished = updateCountdown(unlockDate);
+                if (isFinished) {
+                    clearInterval(countdownInterval);
+                    // Allow unlocking now
+                    if (capsuleData.hasPassphrase) {
+                        document.getElementById('passphrase-container').classList.remove('hidden');
+                        document.getElementById('time-remaining').classList.add('hidden');
+                    } else {
+                        unlockCapsuleFromURLData(capsuleData);
+                    }
+                }
+            }, 1000);
+        }
+    }
+    
+    // Unlock and reveal capsule content from URL data
+    function unlockCapsuleFromURLData(capsuleData) {
+        // Hide locked container, show unlocked container
+        document.getElementById('locked-container').classList.add('hidden');
+        document.getElementById('unlocked-container').classList.remove('hidden');
+        
+        // Set message content
+        const messageReveal = document.getElementById('message-reveal');
+        messageReveal.textContent = capsuleData.message;
+        
+        // Apply theme to message container
+        if (typeof ThemeService !== 'undefined' && ThemeService.applyMessageTheme) {
+            ThemeService.applyMessageTheme(capsuleData.theme, document.getElementById('unlocked-container'));
+        }
+        
+        // Get animation container
+        const animationContainer = document.getElementById('theme-animation-container');
+        
+        // Play animation with theme
+        AnimationManager.playAnimation(capsuleData.theme, animationContainer);
+        
+        // Set up download memory button
+        document.getElementById('download-memory').addEventListener('click', () => {
+            // Generate a readable, SEO-friendly filename
+            const date = new Date();
+            const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+            const filename = `unwraplater-memory-${formattedDate}.html`;
+            
+            // Generate the memory HTML content
+            const htmlContent = Helpers.generateMemoryFile(capsuleData, null, capsuleData.theme);
+            
+            // Download the file
+            Helpers.downloadFile(htmlContent, filename, 'text/html');
+        });
+        
+        // Set up create response button
+        document.getElementById('create-response').addEventListener('click', () => {
+            // Stop animation
+            AnimationManager.stopAnimation();
+            
+            // Hide all sections, show create section
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.remove('active-section');
+                section.classList.add('hidden-section');
+            });
+            
+            createSection.classList.remove('hidden-section');
+            createSection.classList.add('active-section');
+        });
     }
     
     // Update countdown display
