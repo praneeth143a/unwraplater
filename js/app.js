@@ -155,10 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = e.target.files[0];
         
         if (file) {
-            // Check file size (limit to 10MB per file)
-            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+            // Check file size (limit to 50MB per file)
+            const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
             if (file.size > MAX_FILE_SIZE) {
-                alert('File is too large. Maximum size is 10MB.');
+                alert('File is too large. Maximum size is 50MB.');
                 return;
             }
             
@@ -1437,6 +1437,112 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return "#" + RR + GG + BB;
     }
+
+    // Verify password function
+    async function verifyPassword(inputPassword, storedPassword) {
+        try {
+            // Extract salt and hash from stored password
+            const parts = storedPassword.split(':');
+            const salt = parts[0];
+            const storedHash = parts[1];
+            
+            // Convert salt to ArrayBuffer
+            const encoder = new TextEncoder();
+            const saltBuffer = encoder.encode(salt);
+            
+            // Derive key using same parameters as encryption
+            const keyMaterial = await window.crypto.subtle.importKey(
+                "raw",
+                encoder.encode(inputPassword),
+                { name: "PBKDF2" },
+                false,
+                ["deriveBits", "deriveKey"]
+            );
+            
+            const key = await window.crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: saltBuffer,
+                    iterations: 100000,
+                    hash: "SHA-256"
+                },
+                keyMaterial,
+                { name: "HMAC", hash: "SHA-256", length: 256 },
+                true,
+                ["sign", "verify"]
+            );
+            
+            // Export the derived key
+            const keyBuffer = await window.crypto.subtle.exportKey("raw", key);
+            
+            // Convert to hex for comparison
+            const keyArray = Array.from(new Uint8Array(keyBuffer));
+            const derivedHash = keyArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            // Compare the hashes
+            return derivedHash === storedHash;
+        } catch (error) {
+            console.error("Error verifying password:", error);
+            return false;
+        }
+    }
+
+    // Unwrap time capsule immediately function
+    function unwrapLater() {
+        const capsuleContentElement = document.getElementById('capsule-content');
+        const unlockSection = document.getElementById('unlock-section');
+        const viewSection = document.getElementById('view-section');
+        
+        if (capsuleContentElement && unlockSection && viewSection) {
+            // Hide the unlock section
+            unlockSection.classList.add('hidden');
+            
+            // Show the view section
+            viewSection.classList.remove('hidden');
+            
+            // Retrieve and display the time capsule content
+            try {
+                const savedCapsule = localStorage.getItem('timeCapsule');
+                if (savedCapsule) {
+                    const capsuleData = JSON.parse(savedCapsule);
+                    
+                    // Display theme
+                    const themeIcon = document.getElementById('display-theme-icon');
+                    const themeName = document.getElementById('display-theme-name');
+                    if (themeIcon && themeName && capsuleData.theme) {
+                        themeIcon.textContent = capsuleData.theme.icon;
+                        themeName.textContent = capsuleData.theme.name;
+                    }
+                    
+                    // Display message
+                    const messageElement = document.getElementById('display-message');
+                    if (messageElement && capsuleData.message) {
+                        messageElement.textContent = capsuleData.message;
+                    }
+                    
+                    // Display media if present
+                    const mediaContainer = document.getElementById('display-media');
+                    if (mediaContainer && capsuleData.media) {
+                        if (capsuleData.mediaType.startsWith('image/')) {
+                            const img = document.createElement('img');
+                            img.src = capsuleData.media;
+                            img.classList.add('display-media-content');
+                            mediaContainer.appendChild(img);
+                        } else if (capsuleData.mediaType.startsWith('audio/')) {
+                            const audio = document.createElement('audio');
+                            audio.src = capsuleData.media;
+                            audio.controls = true;
+                            audio.classList.add('display-media-content');
+                            mediaContainer.appendChild(audio);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error displaying time capsule:', error);
+                capsuleContentElement.textContent = 'Error loading your time capsule.';
+            }
+        }
+    }
 });
 
 /**
@@ -1444,7 +1550,7 @@ document.addEventListener('DOMContentLoaded', () => {
  * @param {number} mediaSize - Size of the media in bytes
  */
 function checkStorageLimit(mediaSize) {
-    const MAX_RECOMMENDED_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_RECOMMENDED_SIZE = 50 * 1024 * 1024; // 50MB
     
     if (mediaSize > MAX_RECOMMENDED_SIZE) {
         const container = document.querySelector('.media-upload-container');

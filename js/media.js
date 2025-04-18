@@ -6,7 +6,7 @@ const MediaUtil = (() => {
     // Allowed media types
     const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
     const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm'];
-    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
     
     /**
      * Check if a file is a valid image or video
@@ -202,7 +202,7 @@ const MediaUtil = (() => {
             }
             
             if (!isValidMediaFile(file)) {
-                alert('Invalid file. Please select a valid image or video file under 10MB.');
+                alert('Invalid file. Please select a valid image or video file under 50MB.');
                 fileInput.value = '';
                 
                 if (typeof onMediaChange === 'function') {
