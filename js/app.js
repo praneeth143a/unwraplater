@@ -383,8 +383,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
-        // Generate share link
-        const shareLink = `${window.location.origin}${window.location.pathname}?capsule=${capsule.id}`;
+        // Generate share link with absolute URL
+        // Uses the GitHub Pages URL or falls back to the current location
+        const baseUrl = "https://praneeth143a.github.io/unwraplater/";
+        const shareLink = `${baseUrl}?capsule=${capsule.id}`;
         
         // Set the link input value
         const linkInput = document.getElementById('capsule-link');
@@ -497,7 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.execCommand('copy');
         
         // Show copied notification
-        alert('Link copied to clipboard!');
+        alert('Link copied to clipboard!\n\nNote: To make your capsule accessible from any device, please use the "Download Capsule" button and share that file instead.');
     });
     
     // Download capsule button
@@ -518,11 +520,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD format
                 const filename = `unwraplater-capsule-${formattedDate}.html`;
                 
-                // Generate the memory HTML content
-                const htmlContent = Helpers.generateMemoryFile(capsule, capsuleMedia, capsule.theme);
+                // Generate the standalone HTML file with embedded capsule data
+                const htmlContent = generateStandaloneCapsuleFile(capsule, capsuleMedia);
                 
                 // Download the file
                 Helpers.downloadFile(htmlContent, filename, 'text/html');
+                
+                // Show success message
+                alert('Capsule downloaded successfully! You can share this file with anyone, and it will work on any device.');
             } else {
                 alert('Capsule not found in storage.');
             }
@@ -530,6 +535,420 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Could not find capsule ID in the share link.');
         }
     });
+    
+    /**
+     * Generate a standalone HTML file with embedded capsule data
+     * This file will work without relying on local storage
+     * @param {Object} capsule - The capsule object
+     * @param {Object} mediaData - The media data object
+     * @returns {string} - HTML content
+     */
+    function generateStandaloneCapsuleFile(capsule, mediaData) {
+        // Create a complete, self-contained HTML file
+        const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnwrapLater - Time Capsule</title>
+    <style>
+        :root {
+            --primary-color: #8e44ad;
+            --secondary-color: #9b59b6;
+            --accent-color: #e74c3c;
+            --background-color: #e6f7ff;
+            --card-bg-color: #f0f8ff;
+            --text-color: #333333;
+            --border-color: #bde0ff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --transition-speed: 0.3s;
+            --animation-speed: 0.5s;
+        }
+        
+        [data-capsule-theme="love"] {
+            --theme-primary: #e74c3c;
+            --theme-secondary: #c0392b;
+            --theme-accent: #ff7979;
+            --theme-bg: #fff5f5;
+            --theme-gradient: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+        }
+        
+        [data-capsule-theme="bestFriends"] {
+            --theme-primary: #3498db;
+            --theme-secondary: #2980b9;
+            --theme-accent: #74b9ff;
+            --theme-bg: #f5f9ff;
+            --theme-gradient: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+        
+        [data-capsule-theme="birthday"] {
+            --theme-primary: #f1c40f;
+            --theme-secondary: #f39c12;
+            --theme-accent: #fdcb6e;
+            --theme-bg: #fffef5;
+            --theme-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        }
+        
+        [data-capsule-theme="celebration"] {
+            --theme-primary: #9b59b6;
+            --theme-secondary: #8e44ad;
+            --theme-accent: #a29bfe;
+            --theme-bg: #f9f5ff;
+            --theme-gradient: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .capsule-container {
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 8px 20px var(--shadow-color);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .lock-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+            text-align: center;
+        }
+        
+        #unlock-message {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        #time-remaining {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 1rem;
+            border-radius: 8px;
+            min-width: 70px;
+        }
+        
+        .countdown-item span:first-child {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .countdown-label {
+            font-size: 0.875rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        #unlocked-container {
+            text-align: center;
+        }
+        
+        #message-reveal {
+            font-size: 1.2rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        #theme-animation-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.2;
+        }
+        
+        #media-reveal {
+            max-width: 90%;
+            margin: 0 auto 2rem;
+        }
+        
+        #media-reveal img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .audio-container {
+            padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            margin: 1rem auto;
+            max-width: 300px;
+        }
+        
+        audio {
+            width: 100%;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 600px) {
+            #time-remaining {
+                flex-wrap: wrap;
+            }
+            
+            .countdown-item {
+                flex: 1 0 40%;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>UnwrapLater</h1>
+            <p>A time capsule message waiting to be opened</p>
+        </header>
+        
+        <div id="locked-container" class="capsule-container">
+            <div class="lock-icon">🔒</div>
+            <p id="unlock-message">This capsule will unlock on <span id="unlock-date-display"></span></p>
+            
+            <div id="time-remaining">
+                <div class="countdown-item">
+                    <span id="days-remaining">--</span>
+                    <span class="countdown-label">Days</span>
+                </div>
+                <div class="countdown-item">
+                    <span id="hours-remaining">--</span>
+                    <span class="countdown-label">Hours</span>
+                </div>
+                <div class="countdown-item">
+                    <span id="minutes-remaining">--</span>
+                    <span class="countdown-label">Minutes</span>
+                </div>
+                <div class="countdown-item">
+                    <span id="seconds-remaining">--</span>
+                    <span class="countdown-label">Seconds</span>
+                </div>
+            </div>
+            
+            <div id="unlock-now-container" class="hidden">
+                <button id="unlock-now">Unlock Now</button>
+            </div>
+        </div>
+        
+        <div id="unlocked-container" class="capsule-container hidden" data-capsule-theme="${capsule.theme}">
+            <div id="theme-animation-container"></div>
+            <div id="message-reveal"></div>
+            <div id="media-reveal" class="hidden"></div>
+        </div>
+        
+        <footer>
+            <p>© 2025 UnwrapLater – Where moments wait to be remembered.</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Embedded capsule data
+        const capsule = ${JSON.stringify(capsule)};
+        const capsuleMedia = ${JSON.stringify(mediaData || null)};
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set unlock date display
+            const unlockDate = new Date(capsule.unlockDate);
+            document.getElementById('unlock-date-display').textContent = new Intl.DateTimeFormat(navigator.language, {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                timeZoneName: 'short'
+            }).format(unlockDate);
+            
+            // Check if the capsule can be unlocked
+            const now = new Date();
+            const canUnlock = now >= unlockDate;
+            
+            // Update countdown
+            updateCountdown();
+            // Set interval to update countdown
+            const countdownInterval = setInterval(() => {
+                // Return value indicates if countdown is finished
+                const isFinished = updateCountdown();
+                if (isFinished) {
+                    clearInterval(countdownInterval);
+                    // Show unlock button
+                    document.getElementById('unlock-now-container').classList.remove('hidden');
+                }
+            }, 1000);
+            
+            // Set up unlock button
+            document.getElementById('unlock-now').addEventListener('click', () => {
+                unlockCapsule();
+            });
+            
+            // If capsule is already unlockable, show the button
+            if (canUnlock) {
+                document.getElementById('unlock-now-container').classList.remove('hidden');
+            }
+            
+            function updateCountdown() {
+                const now = new Date();
+                const timeRemaining = unlockDate - now;
+                
+                if (timeRemaining <= 0) {
+                    // Time's up, show unlock interface
+                    document.getElementById('time-remaining').classList.add('hidden');
+                    document.getElementById('unlock-message').textContent = "This capsule is now ready to open!";
+                    return true;
+                }
+                
+                // Calculate remaining time units
+                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+                
+                // Update display
+                document.getElementById('days-remaining').textContent = days;
+                document.getElementById('hours-remaining').textContent = hours;
+                document.getElementById('minutes-remaining').textContent = minutes;
+                document.getElementById('seconds-remaining').textContent = seconds;
+                
+                return false;
+            }
+            
+            function unlockCapsule() {
+                // Hide locked container, show unlocked container
+                document.getElementById('locked-container').classList.add('hidden');
+                document.getElementById('unlocked-container').classList.remove('hidden');
+                
+                // Set message content
+                const messageReveal = document.getElementById('message-reveal');
+                messageReveal.textContent = capsule.message;
+                
+                // Apply theme to container
+                const container = document.getElementById('unlocked-container');
+                container.setAttribute('data-capsule-theme', capsule.theme);
+                
+                // Add background based on theme
+                const themeContainer = document.getElementById('theme-animation-container');
+                themeContainer.style.background = 'var(--theme-gradient)';
+                
+                // Load media if exists
+                if (capsuleMedia && capsuleMedia.data) {
+                    const mediaReveal = document.getElementById('media-reveal');
+                    mediaReveal.classList.remove('hidden');
+                    
+                    if (capsuleMedia.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = capsuleMedia.data;
+                        mediaReveal.appendChild(img);
+                    } else if (capsuleMedia.type.startsWith('audio/')) {
+                        const audioContainer = document.createElement('div');
+                        audioContainer.className = 'audio-container';
+                        
+                        const audio = document.createElement('audio');
+                        audio.src = capsuleMedia.data;
+                        audio.controls = true;
+                        
+                        audioContainer.appendChild(audio);
+                        mediaReveal.appendChild(audioContainer);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>`;
+        
+        return html;
+    }
     
     // Form validation
     function validateForm() {
