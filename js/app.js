@@ -438,54 +438,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const shareTitle = 'Check out my UnwrapLater time capsule!';
         const shareText = `${shareTitle} It will unlock on ${new Date(capsule.unlockDate).toLocaleDateString()}. Click the link to view!`;
         
-        // WhatsApp Share
-        const whatsappBtn = document.getElementById('share-whatsapp');
-        if (whatsappBtn) {
-            whatsappBtn.addEventListener('click', (e) => {
+        // Share to Any App button using Web Share API
+        const shareAnyBtn = document.getElementById('share-any');
+        if (shareAnyBtn) {
+            shareAnyBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
-                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
-                window.open(whatsappUrl, '_blank');
-            });
-        }
-        
-        // Facebook Share
-        const facebookBtn = document.getElementById('share-facebook');
-        if (facebookBtn) {
-            facebookBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-                window.open(facebookUrl, '_blank');
-            });
-        }
-        
-        // Twitter Share
-        const twitterBtn = document.getElementById('share-twitter');
-        if (twitterBtn) {
-            twitterBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-                window.open(twitterUrl, '_blank');
-            });
-        }
-        
-        // Email Share
-        const emailBtn = document.getElementById('share-email');
-        if (emailBtn) {
-            emailBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const subject = encodeURIComponent(shareTitle);
-                const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
-                window.location.href = `mailto:?subject=${subject}&body=${body}`;
-            });
-        }
-        
-        // SMS Share
-        const smsBtn = document.getElementById('share-sms');
-        if (smsBtn) {
-            smsBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const smsText = encodeURIComponent(`${shareText} ${shareUrl}`);
-                window.location.href = `sms:?body=${smsText}`;
+                
+                // Check if Web Share API is supported
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: shareTitle,
+                            text: shareText,
+                            url: shareUrl
+                        });
+                        console.log('Shared successfully');
+                    } catch (err) {
+                        console.log('Error sharing: ', err);
+                        // Fallback for when sharing is cancelled or fails
+                        alert('Could not share. Try copying the link instead.');
+                    }
+                } else {
+                    // Fallback for browsers that don't support Web Share API
+                    alert('Your browser does not support direct sharing. Please copy the link instead.');
+                    
+                    // Automatically select the link for easy copying
+                    const linkInput = document.getElementById('capsule-link');
+                    linkInput.select();
+                    document.execCommand('copy');
+                    alert('Link copied to clipboard!');
+                }
             });
         }
     }
