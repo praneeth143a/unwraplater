@@ -16,6 +16,13 @@ class TimeCapsuleApp {
         this.themeSelect = document.getElementById('theme-select');
         this.passphraseInput = document.getElementById('passphrase');
         
+        // Character counter elements
+        this.charCount = document.getElementById('char-count');
+        this.charLimit = document.getElementById('char-limit');
+        this.messageWarning = document.getElementById('message-warning');
+        this.charCounter = document.querySelector('.char-counter');
+        this.MAX_CHAR_LIMIT = 800; // Maximum character limit for reliable URL generation
+        
         // Result elements
         this.capsuleLinkInput = document.getElementById('capsule-link');
         
@@ -30,6 +37,9 @@ class TimeCapsuleApp {
         
         // Set default unlock time (1 minute from now)
         this.setDefaultUnlockTime();
+        
+        // Setup character counter for message input
+        this.setupCharacterCounter();
         
         // Check if there's a capsule in the URL
         this.checkForCapsuleInUrl();
@@ -131,11 +141,55 @@ class TimeCapsuleApp {
         history.pushState("", document.title, window.location.pathname + window.location.search);
     }
     
+    /**
+     * Setup character counter and validation for message input
+     */
+    setupCharacterCounter() {
+        // Set initial character limit in the UI
+        this.charLimit.textContent = this.MAX_CHAR_LIMIT;
+        
+        // Update character count in real-time as user types
+        this.messageInput.addEventListener('input', () => {
+            const currentLength = this.messageInput.value.length;
+            this.charCount.textContent = currentLength;
+            
+            // Check if message exceeds the character limit
+            if (currentLength > this.MAX_CHAR_LIMIT) {
+                // Add warning styles
+                this.messageInput.classList.add('exceeded');
+                this.charCounter.classList.add('exceeded');
+                this.messageWarning.classList.remove('hidden');
+                
+                // Disable create button
+                document.getElementById('create-capsule').disabled = true;
+                document.getElementById('create-capsule').classList.add('disabled');
+            } else {
+                // Remove warning styles
+                this.messageInput.classList.remove('exceeded');
+                this.charCounter.classList.remove('exceeded');
+                this.messageWarning.classList.add('hidden');
+                
+                // Enable create button
+                document.getElementById('create-capsule').disabled = false;
+                document.getElementById('create-capsule').classList.remove('disabled');
+            }
+        });
+        
+        // Initial check in case there's prefilled content
+        this.messageInput.dispatchEvent(new Event('input'));
+    }
+    
     async createCapsule() {
         // Validate inputs
         const message = this.messageInput.value.trim();
         if (!message) {
             alert('Please enter a message.');
+            return;
+        }
+        
+        // Check if message is too long
+        if (message.length > this.MAX_CHAR_LIMIT) {
+            alert(`Message is too long! Please shorten it to less than ${this.MAX_CHAR_LIMIT} characters.`);
             return;
         }
         
