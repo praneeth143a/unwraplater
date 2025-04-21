@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="UnwrapLater - Create time capsule messages that can only be opened at a specific time">
     <title>UnwrapLater - Time Capsule Messages</title>
     <link rel="stylesheet" href="src/css/styles.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap">
@@ -13,73 +14,84 @@
             <h1>UnwrapLater</h1>
             <p>Create time capsule messages with beautiful animations</p>
             <p class="subtitle">All data is stored directly in the URL - no server required!</p>
-            <div class="theme-toggle">
-                <span class="light-mode">☀️</span>
-                <span class="dark-mode">🌙</span>
+            <div class="theme-toggle" aria-label="Toggle dark/light mode">
+                <span class="light-mode" aria-label="Light mode">☀️</span>
+                <span class="dark-mode" aria-label="Dark mode">🌙</span>
             </div>
         </header>
 
         <main>
+            <!-- Create View - Form for creating a new time capsule -->
             <div id="create-view" class="view active">
                 <div class="card">
                     <h2>Create Your Time Capsule</h2>
                     
-                    <div class="form-group">
-                        <label for="message">Your Message</label>
-                        <textarea id="message" placeholder="Write something special..."></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="unlock-time">When can it be opened?</label>
-                        <input type="datetime-local" id="unlock-time">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="theme-select">Choose a Theme</label>
-                        <select id="theme-select">
-                            <option value="love">💖 Love</option>
-                            <option value="friendship">🤝 Best Friends</option>
-                            <option value="birthday">🎂 Birthday</option>
-                            <option value="celebration">🎉 Celebration</option>
-                            <option value="custom">✨ Custom Theme</option>
-                        </select>
-                    </div>
-                    
-                    <div id="custom-theme-options" class="hidden">
-                        <div class="form-group">
-                            <label for="custom-bg-color">Background Color</label>
-                            <input type="color" id="custom-bg-color" value="#ffffff">
+                    <div class="create-layout">
+                        <!-- Main Form Section -->
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="message">Your Message</label>
+                                <textarea id="message" placeholder="Write something special..." aria-required="true"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="unlock-time">When can it be opened?</label>
+                                <input type="datetime-local" id="unlock-time" aria-required="true">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="theme-select">Choose a Theme</label>
+                                <select id="theme-select">
+                                    <option value="love">💖 Love</option>
+                                    <option value="friendship">🤝 Best Friends</option>
+                                    <option value="birthday">🎂 Birthday</option>
+                                    <option value="celebration">🎉 Celebration</option>
+                                    <option value="custom">✨ Custom Theme</option>
+                                </select>
+                            </div>
+                            
+                            <div id="custom-theme-options" class="hidden">
+                                <div class="custom-options-grid">
+                                    <div class="form-group">
+                                        <label for="custom-bg-color">Background Color</label>
+                                        <input type="color" id="custom-bg-color" value="#ffffff">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="custom-font">Font Style</label>
+                                        <select id="custom-font">
+                                            <option value="poppins">Poppins</option>
+                                            <option value="roboto">Roboto</option>
+                                            <option value="playfair">Playfair Display</option>
+                                            <option value="montserrat">Montserrat</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="custom-animation">Animation</label>
+                                        <select id="custom-animation">
+                                            <option value="none">None</option>
+                                            <option value="particles">Particles</option>
+                                            <option value="sparkles">Sparkles</option>
+                                            <option value="confetti">Confetti</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="passphrase">Optional Passphrase</label>
+                                <input type="password" id="passphrase" placeholder="Leave empty for no passphrase">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="custom-font">Font Style</label>
-                            <select id="custom-font">
-                                <option value="poppins">Poppins</option>
-                                <option value="roboto">Roboto</option>
-                                <option value="playfair">Playfair Display</option>
-                                <option value="montserrat">Montserrat</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="custom-animation">Animation</label>
-                            <select id="custom-animation">
-                                <option value="none">None</option>
-                                <option value="particles">Particles</option>
-                                <option value="sparkles">Sparkles</option>
-                                <option value="confetti">Confetti</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="passphrase">Optional Passphrase</label>
-                        <input type="password" id="passphrase" placeholder="Leave empty for no passphrase">
-                    </div>
-                    
-                    <div class="theme-preview" id="theme-preview">
-                        <div class="preview-container">
-                            <div class="preview-label">Theme Preview</div>
-                            <div class="preview-content">
-                                <p>Your message will look like this</p>
+                        
+                        <!-- Preview Section -->
+                        <div class="preview-section">
+                            <div class="theme-preview" id="theme-preview">
+                                <div class="preview-container">
+                                    <div class="preview-label">Theme Preview</div>
+                                    <div class="preview-content">
+                                        <p>Your message will look like this</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -90,6 +102,7 @@
                 </div>
             </div>
             
+            <!-- Result View - Shown after capsule creation -->
             <div id="result-view" class="view">
                 <div class="card">
                     <h2>Your Time Capsule is Ready!</h2>
@@ -97,7 +110,7 @@
                         <p>Share this link:</p>
                         <p class="note">The entire message data is contained in this URL - no need for any servers!</p>
                         <div class="link-container">
-                            <input type="text" id="capsule-link" readonly>
+                            <input type="text" id="capsule-link" readonly aria-label="Capsule link">
                             <button id="copy-link" class="btn secondary">Copy</button>
                         </div>
                     </div>
@@ -108,10 +121,12 @@
                 </div>
             </div>
             
+            <!-- Unlock View - Shown when visiting a capsule link -->
             <div id="unlock-view" class="view">
                 <div class="card">
                     <h2>Time Capsule</h2>
                     <div id="unlock-status">
+                        <!-- Countdown Timer -->
                         <div id="timer-container" class="hidden">
                             <p>This message will unlock in:</p>
                             <div class="countdown-timer">
@@ -134,15 +149,17 @@
                             </div>
                         </div>
                         
+                        <!-- Passphrase Input -->
                         <div id="passphrase-container" class="hidden">
                             <p>This message is protected with a passphrase:</p>
                             <div class="form-group">
-                                <input type="password" id="enter-passphrase" placeholder="Enter passphrase">
+                                <input type="password" id="enter-passphrase" placeholder="Enter passphrase" aria-label="Enter passphrase">
                                 <button id="submit-passphrase" class="btn primary">Unlock</button>
                             </div>
                         </div>
                     </div>
                     
+                    <!-- Revealed Message Content -->
                     <div id="capsule-content" class="hidden">
                         <div class="message-container">
                             <p id="revealed-message"></p>
@@ -156,7 +173,7 @@
         </main>
         
         <footer>
-            <p>Made with ❤️ | <a href="https://github.com/yourusername/unwraplater" target="_blank">GitHub</a></p>
+            <p>Made with ❤️ | <a href="https://github.com/yourusername/unwraplater" target="_blank" rel="noopener">GitHub</a></p>
         </footer>
     </div>
     

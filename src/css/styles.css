@@ -1,4 +1,10 @@
+/* ==========================================================================
+   UnwrapLater - Responsive Time Capsule App
+   Mobile-first CSS with progressive enhancement for larger screens
+   ========================================================================== */
+
 :root {
+    /* Color Variables */
     --primary-color: #6b46c1;
     --primary-hover: #553c9a;
     --secondary-color: #4299e1;
@@ -10,21 +16,46 @@
     --dark-card: #2d3748;
     --dark-text: #f7fafc;
     --dark-border: #4a5568;
+    
+    /* Shadow Variables */
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    
+    /* UI Variables */
     --radius: 8px;
     --font-main: 'Poppins', sans-serif;
     --transition: all 0.3s ease;
     
-    /* Default theme is light */
+    /* RESPONSIVE TYPOGRAPHY - Mobile First */
+    /* Starts smaller on mobile, scales up with breakpoints */
+    --fs-xs: 0.75rem;    /* 12px - Small labels, footer text */
+    --fs-sm: 0.875rem;   /* 14px - Secondary text, notes */
+    --fs-base: 1rem;     /* 16px - Base body text */
+    --fs-md: 1.125rem;   /* 18px - Revealed message */
+    --fs-lg: 1.25rem;    /* 20px - Section titles on mobile */
+    --fs-xl: 1.5rem;     /* 24px - View headings on mobile */
+    --fs-2xl: 1.75rem;   /* 28px - App title on mobile */
+    --fs-3xl: 2rem;      /* 32px - Reserved for larger screens */
+    
+    /* RESPONSIVE SPACING - Mobile First */
+    /* These create consistent spacing throughout the app */
+    --space-xs: 0.25rem; /* 4px - Minimal spacing */
+    --space-sm: 0.5rem;  /* 8px - Small gaps, tight spacing */
+    --space-md: 0.75rem; /* 12px - Form field padding */
+    --space-base: 1rem;  /* 16px - Standard spacing unit */
+    --space-lg: 1.5rem;  /* 24px - Section margins */
+    --space-xl: 2rem;    /* 32px - Large section spacing */
+    --space-2xl: 3rem;   /* 48px - Major section divisions */
+    
+    /* Theme colors - default to light */
     --bg-color: var(--light-bg);
     --card-bg: var(--light-card);
     --text-color: var(--light-text);
     --border-color: var(--light-border);
 }
 
-/* Dark Mode */
+/* Dark Mode Theme Override */
 body.dark-mode {
     --bg-color: var(--dark-bg);
     --card-bg: var(--dark-card);
@@ -32,12 +63,20 @@ body.dark-mode {
     --border-color: var(--dark-border);
 }
 
-/* Theme-specific variables will be set by JavaScript */
+/* ==========================================================================
+   Base Resets & HTML Elements
+   ========================================================================== */
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    font-size: 100%; /* Respects user's browser font size settings */
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
 }
 
 body {
@@ -47,57 +86,76 @@ body {
     line-height: 1.6;
     transition: var(--transition);
     min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
+/* Make media elements responsive */
+img, svg, video, canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ==========================================================================
+   Layout & Container Structure
+   Mobile-first: stacked layout with minimal padding
+   ========================================================================== */
+
 .app-container {
-    max-width: 800px;
+    width: 100%;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: var(--space-base);
     position: relative;
-    z-index: 2;
+    z-index: 2; /* Stay above animation canvas */
 }
 
 header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-lg);
     position: relative;
+    padding: 0 var(--space-base);
 }
 
 header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+    font-size: var(--fs-2xl);
+    margin-bottom: var(--space-sm);
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     display: inline-block;
+    word-break: break-word; /* Ensures title doesn't overflow on narrow screens */
 }
 
 .subtitle {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     opacity: 0.8;
-    margin-top: 0.5rem;
+    margin-top: var(--space-sm);
     font-style: italic;
 }
 
 .note {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     opacity: 0.8;
-    margin: 0.5rem 0;
+    margin: var(--space-sm) 0;
     font-style: italic;
     color: var(--primary-color);
 }
 
+/* Theme toggle positioned absolutely for space efficiency on small screens */
 .theme-toggle {
     position: absolute;
     top: 0;
     right: 0;
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: var(--fs-lg);
+    display: flex;
+    align-items: center;
 }
 
 .light-mode, .dark-mode {
-    padding: 0.5rem;
+    padding: var(--space-sm);
     transition: var(--transition);
 }
 
@@ -117,15 +175,18 @@ body.dark-mode .dark-mode {
     opacity: 1;
 }
 
+/* Card component - holds each view */
 .card {
     background-color: var(--card-bg);
     border-radius: var(--radius);
     box-shadow: var(--shadow-md);
-    padding: 2rem;
-    margin-bottom: 2rem;
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
     transition: var(--transition);
+    width: 100%;
 }
 
+/* View management */
 .view {
     display: none;
 }
@@ -134,28 +195,63 @@ body.dark-mode .dark-mode {
     display: block;
 }
 
-h2 {
-    margin-bottom: 1.5rem;
-    color: var(--primary-color);
+/* ==========================================================================
+   Create View Layout
+   Mobile-first: Stacked form and preview sections
+   ========================================================================== */
+
+.create-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
 }
 
+.form-section {
+    flex: 1;
+}
+
+.preview-section {
+    flex: 1;
+}
+
+/* Custom theme options grid for better organization */
+.custom-options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+}
+
+/* ==========================================================================
+   Typography & Text Elements
+   Mobile-first: Smaller, more compact text initially
+   ========================================================================== */
+
+h2 {
+    font-size: var(--fs-xl);
+    margin-bottom: var(--space-lg);
+    color: var(--primary-color);
+    word-break: break-word;
+}
+
+/* Form elements - stacked on mobile */
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
 }
 
 label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-sm);
     font-weight: 500;
+    font-size: var(--fs-base);
 }
 
 input, textarea, select {
     width: 100%;
-    padding: 0.75rem;
+    padding: var(--space-md);
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
     font-family: var(--font-main);
-    font-size: 1rem;
+    font-size: var(--fs-base);
     background-color: var(--card-bg);
     color: var(--text-color);
     transition: var(--transition);
@@ -172,22 +268,33 @@ textarea {
     resize: vertical;
 }
 
+/* ==========================================================================
+   Button & Interactive Elements
+   Mobile-first: Full-width, stacked buttons
+   ========================================================================== */
+
 .button-group {
     display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
+    flex-direction: column; /* Stack buttons on mobile */
+    gap: var(--space-base);
+    margin-top: var(--space-lg);
 }
 
 .btn {
-    padding: 0.75rem 1.5rem;
+    padding: var(--space-md) var(--space-lg);
     border: none;
     border-radius: var(--radius);
     font-family: var(--font-main);
     font-weight: 500;
-    font-size: 1rem;
+    font-size: var(--fs-base);
     cursor: pointer;
     transition: var(--transition);
-    flex: 1;
+    text-align: center;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1.2;
+    min-height: 44px; /* Minimum touch target size for accessibility */
 }
 
 .btn.primary {
@@ -213,9 +320,13 @@ textarea {
     display: none;
 }
 
-/* Theme Preview */
+/* ==========================================================================
+   Theme Preview Component
+   Mobile-first: Compact preview with minimal height
+   ========================================================================== */
+
 .theme-preview {
-    margin: 1.5rem 0;
+    margin: 0;
     border-radius: var(--radius);
     overflow: hidden;
     border: 1px solid var(--border-color);
@@ -224,9 +335,18 @@ textarea {
 
 .preview-container {
     position: relative;
-    padding: 1rem;
-    min-height: 100px;
+    padding: var(--space-base);
+    min-height: 150px; /* Taller on mobile for better visibility */
     /* Theme-specific background will be set by JavaScript */
+}
+
+.preview-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding-top: var(--space-lg);
+    text-align: center;
 }
 
 .preview-label {
@@ -235,73 +355,106 @@ textarea {
     left: 0;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--fs-xs);
     border-bottom-right-radius: var(--radius);
 }
 
-/* Capsule Link */
+/* ==========================================================================
+   Capsule Link Section
+   Mobile-first: Stacked elements for narrow screens
+   ========================================================================== */
+
 .link-container {
     display: flex;
-    gap: 0.5rem;
+    flex-direction: column; /* Stack on mobile */
+    gap: var(--space-sm);
 }
 
 .link-container input {
     flex: 1;
+    overflow-x: auto; /* Allow scrolling for long URLs */
+    white-space: nowrap;
+    font-size: var(--fs-sm);
 }
 
 .link-container button {
-    flex: none;
+    width: 100%; /* Full width on mobile */
 }
 
-/* Countdown Timer */
+/* ==========================================================================
+   Countdown Timer Component
+   Mobile-first: 2x2 grid for compact display
+   ========================================================================== */
+
 .countdown-timer {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin: 1.5rem 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2-column grid on mobile */
+    gap: var(--space-base);
+    margin: var(--space-lg) 0;
 }
 
 .time-unit {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: var(--space-sm);
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius);
 }
 
 .time-unit span {
-    font-size: 2rem;
+    font-size: var(--fs-xl);
     font-weight: 700;
     line-height: 1;
 }
 
 .time-unit .label {
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     opacity: 0.7;
-    margin-top: 0.25rem;
+    margin-top: var(--space-xs);
 }
 
-/* Message reveal */
+/* ==========================================================================
+   Message Reveal Component
+   Mobile-first: Simple centered layout with padding
+   ========================================================================== */
+
 .message-container {
     background-color: rgba(255, 255, 255, 0.1);
-    padding: 2rem;
+    padding: var(--space-lg);
     border-radius: var(--radius);
-    margin: 1.5rem 0;
+    margin: var(--space-lg) 0;
     position: relative;
     overflow: hidden;
+    word-wrap: break-word;
     /* Theme-specific styling will be applied by JavaScript */
 }
 
 #revealed-message {
-    font-size: 1.25rem;
+    font-size: var(--fs-md);
     text-align: center;
     white-space: pre-wrap;
+    word-break: break-word; /* Ensures message doesn't overflow */
 }
+
+/* Passphrase input layout */
+#passphrase-container .form-group {
+    display: flex;
+    flex-direction: column; /* Stack on mobile */
+    gap: var(--space-sm);
+}
+
+/* ==========================================================================
+   Footer Component
+   ========================================================================== */
 
 footer {
     text-align: center;
-    margin-top: 3rem;
+    margin-top: var(--space-2xl);
+    padding: var(--space-lg) 0;
     opacity: 0.7;
-    font-size: 0.875rem;
+    font-size: var(--fs-sm);
 }
 
 footer a {
@@ -313,7 +466,11 @@ footer a:hover {
     text-decoration: underline;
 }
 
-/* Canvas for animations */
+/* ==========================================================================
+   Canvas Animation Container
+   Full viewport coverage
+   ========================================================================== */
+
 #animation-canvas {
     position: fixed;
     top: 0;
@@ -321,34 +478,14 @@ footer a:hover {
     width: 100%;
     height: 100%;
     z-index: 1;
-    pointer-events: none;
+    pointer-events: none; /* Allow clicks to pass through */
 }
 
-/* Responsive styles */
-@media (max-width: 768px) {
-    .app-container {
-        padding: 1rem;
-    }
-    
-    .card {
-        padding: 1.5rem;
-    }
-    
-    header h1 {
-        font-size: 2rem;
-    }
-    
-    .countdown-timer {
-        gap: 0.5rem;
-    }
-    
-    .time-unit span {
-        font-size: 1.5rem;
-    }
-}
+/* ==========================================================================
+   Theme-specific Styles
+   These provide theme colors that will be used by JavaScript
+   ========================================================================== */
 
-/* Theme specific classes will be added by JavaScript */
-/* Love Theme */
 .theme-love {
     --theme-primary: #ff4d6d;
     --theme-secondary: #ff8fa3;
@@ -356,7 +493,6 @@ footer a:hover {
     --theme-font: 'Poppins', sans-serif;
 }
 
-/* Best Friends Theme */
 .theme-friendship {
     --theme-primary: #4f46e5;
     --theme-secondary: #818cf8;
@@ -364,7 +500,6 @@ footer a:hover {
     --theme-font: 'Poppins', sans-serif;
 }
 
-/* Birthday Theme */
 .theme-birthday {
     --theme-primary: #f59e0b;
     --theme-secondary: #fbbf24;
@@ -372,10 +507,271 @@ footer a:hover {
     --theme-font: 'Poppins', sans-serif;
 }
 
-/* Celebration Theme */
 .theme-celebration {
     --theme-primary: #10b981;
     --theme-secondary: #34d399;
     --theme-bg: linear-gradient(135deg, #34d399, #10b981);
     --theme-font: 'Poppins', sans-serif;
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS 
+   ========================================================================== */
+
+/* ==========================================================================
+   Tablet (600px+)
+   Key changes: 
+   - More horizontal layout
+   - Larger text
+   - Side-by-side elements where appropriate
+   ========================================================================== */
+
+@media (min-width: 600px) {
+    :root {
+        /* Slightly larger text on tablets */
+        --fs-2xl: 2rem;      /* 32px */
+        --fs-3xl: 2.25rem;   /* 36px */
+    }
+    
+    .app-container {
+        padding: var(--space-lg);
+    }
+    
+    .card {
+        padding: var(--space-xl);
+    }
+    
+    /* Custom theme options in 2-column grid */
+    .custom-options-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    /* Buttons shift to horizontal layout */
+    .button-group {
+        flex-direction: row;
+    }
+    
+    /* Capsule link becomes side-by-side */
+    .link-container {
+        flex-direction: row;
+    }
+    
+    .link-container button {
+        width: auto;
+        white-space: nowrap;
+    }
+    
+    /* Countdown becomes a row of 4 units */
+    .countdown-timer {
+        grid-template-columns: repeat(4, 1fr);
+        justify-content: space-between;
+    }
+    
+    /* Passphrase input and button side-by-side */
+    #passphrase-container .form-group {
+        flex-direction: row;
+    }
+    
+    #passphrase-container .btn {
+        width: auto;
+    }
+    
+    /* Begin to show form and preview side-by-side */
+    .create-layout {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--space-lg);
+    }
+    
+    .form-section {
+        flex: 1 1 65%;
+    }
+    
+    .preview-section {
+        flex: 1 1 30%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .preview-container {
+        min-height: 200px;
+    }
+}
+
+/* ==========================================================================
+   Desktop (1024px+)
+   Key changes:
+   - Fixed-width centered container
+   - More generous spacing
+   - Larger text and elements
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+    :root {
+        /* Larger text on desktop */
+        --fs-2xl: 2.25rem;   /* 36px */
+        --fs-3xl: 2.5rem;    /* 40px */
+    }
+    
+    .app-container {
+        max-width: 800px; /* Constrained width for readability */
+        padding: var(--space-xl);
+    }
+    
+    header h1 {
+        font-size: var(--fs-3xl);
+    }
+    
+    /* More generous spacing between countdown units */
+    .countdown-timer {
+        gap: var(--space-lg);
+    }
+    
+    /* Larger countdown numbers */
+    .time-unit span {
+        font-size: var(--fs-2xl);
+    }
+    
+    /* Larger readable message */
+    #revealed-message {
+        font-size: var(--fs-lg);
+    }
+    
+    /* Form and preview side-by-side layout */
+    .create-layout {
+        flex-wrap: nowrap;
+    }
+    
+    .form-section {
+        flex: 3; /* Form takes 3/4 of the space */
+    }
+    
+    .preview-section {
+        flex: 1; /* Preview takes 1/4 of the space */
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .theme-preview {
+        flex-grow: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .preview-container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 300px;
+    }
+    
+    .preview-content {
+        flex-grow: 1;
+    }
+}
+
+/* ==========================================================================
+   Large Desktops (1440px+)
+   Key changes:
+   - Wider container
+   - Potentially two-column layouts
+   ========================================================================== */
+
+@media (min-width: 1440px) {
+    .app-container {
+        max-width: 1000px;
+    }
+    
+    /* Even larger preview on big screens */
+    .preview-container {
+        min-height: 350px;
+    }
+}
+
+/* ==========================================================================
+   Special Case: Mobile Landscape Orientation
+   Key changes:
+   - Reduced vertical spacing
+   - Smaller elements to fit within limited height
+   ========================================================================== */
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .app-container {
+        padding: var(--space-sm);
+    }
+    
+    .card {
+        padding: var(--space-base);
+        margin-bottom: var(--space-base);
+    }
+    
+    header {
+        margin-bottom: var(--space-base);
+    }
+    
+    h2 {
+        margin-bottom: var(--space-base);
+    }
+    
+    .form-group {
+        margin-bottom: var(--space-base);
+    }
+    
+    .countdown-timer {
+        margin: var(--space-base) 0;
+    }
+    
+    /* Landscape mode specific layout */
+    .create-layout {
+        flex-direction: row;
+        gap: var(--space-base);
+    }
+    
+    .form-section {
+        flex: 2;
+    }
+    
+    .preview-section {
+        flex: 1;
+    }
+    
+    /* Smaller textarea for limited vertical space */
+    textarea {
+        min-height: 80px;
+    }
+    
+    .preview-container {
+        min-height: 100px;
+    }
+}
+
+/* ==========================================================================
+   Print Styles
+   Optimize for printing revealed messages
+   ========================================================================== */
+
+@media print {
+    .btn, 
+    .theme-toggle,
+    input[type="password"],
+    .passphrase-container {
+        display: none !important;
+    }
+    
+    body {
+        background-color: white !important;
+        color: black !important;
+    }
+    
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+    }
+    
+    #revealed-message {
+        color: black !important;
+    }
 } 
