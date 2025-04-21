@@ -155,31 +155,6 @@ class CryptoManager {
         }
         return bytes.buffer;
     }
-    
-    /**
-     * Generate a compact link-friendly hash for sharing
-     * @param {string} data - Data to hash (usually the full capsule JSON)
-     * @returns {Promise<string>} - Short hash for use in URL fragment
-     */
-    async generateShortHash(data) {
-        try {
-            // Use SHA-256 for hashing
-            const encoder = new TextEncoder();
-            const dataBuffer = encoder.encode(data);
-            
-            const hashBuffer = await window.crypto.subtle.digest('SHA-256', dataBuffer);
-            
-            // Convert to Base64 and shorten
-            const base64 = this.arrayBufferToBase64(hashBuffer);
-            
-            // Use first 12 characters for a reasonably short hash
-            // This is not for security, just for creating short links
-            return base64.substring(0, 12).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-        } catch (error) {
-            console.error('Error generating short hash:', error);
-            throw error;
-        }
-    }
 }
 
 // Create and export crypto manager

@@ -15,11 +15,11 @@ UnwrapLater is a web application that lets you create beautiful time capsule mes
 - Unlocks only when the timer hits zero
 - If less than a minute, unlocks instantly
 
-### 🔒 Security & Storage
+### 🔒 Security & URL-Based Storage
 - All logic runs on the client-side (no server required)
 - Messages can be encrypted using Web Crypto API when a passphrase is used
-- Capsules are stored in browser localStorage
-- Small capsule link generated for easy sharing (uses URL fragment)
+- **Capsule data is embedded directly in the URL** (using base64 encoding in the URL fragment)
+- Share links work on any device without requiring server storage or databases
 
 ### 🎨 UI/UX Features
 - Live theme preview when selecting a theme
@@ -40,7 +40,7 @@ UnwrapLater is a web application that lets you create beautiful time capsule mes
 4. Click "Create Time Capsule"
 5. Share the generated link with others
 
-No server or installation is required! All data is stored in the browser's localStorage.
+No server or installation required! All data is stored directly in the URL.
 
 ## Demo
 
@@ -51,8 +51,16 @@ You can try the application at [https://your-username.github.io/unwraplater](htt
 - Built with vanilla JavaScript, HTML, and CSS
 - Uses the Web Crypto API for secure message encryption
 - Canvas-based animations are optimized for performance
-- Fully responsive design that works on mobile and desktop
-- No external dependencies or frameworks required
+- All data is stored in the URL fragment (after the # symbol)
+- No external dependencies, frameworks, or servers required
+
+## How It Works
+
+1. **Creating a capsule**: When you create a time capsule, the app bundles your message, unlock time, and theme settings into a JSON object.
+2. **Embedding data**: This data is stringified, encoded to base64, and added to the URL as a fragment.
+3. **Sharing**: When you share this URL, all the capsule data travels with it - no server needed!
+4. **Decoding**: When someone opens the link, the app decodes the URL fragment to retrieve the original data.
+5. **Unlock logic**: The app checks if it's time to unlock the message yet, and either shows a countdown timer or reveals the message.
 
 ## Browser Compatibility
 

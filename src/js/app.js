@@ -156,16 +156,12 @@ class TimeCapsuleApp {
             }
         }
         
-        // Store the capsule
-        const capsuleId = await this.storeCapsule(capsuleData);
-        
-        // Generate and display the capsule link
-        const capsuleLink = this.generateCapsuleLink(capsuleId);
+        // Generate and display the capsule link by embedding the data in the URL
+        const capsuleLink = this.generateCapsuleLink(capsuleData);
         this.capsuleLinkInput.value = capsuleLink;
         
         // Store the current capsule for download
         this.currentCapsule = {
-            id: capsuleId,
             data: capsuleData
         };
         
@@ -173,29 +169,27 @@ class TimeCapsuleApp {
         this.showView(this.resultView);
     }
     
-    async storeCapsule(capsuleData) {
+    /**
+     * Generate a shareable link by encoding the capsule data into the URL hash
+     * @param {Object} capsuleData - The capsule data object
+     * @returns {string} - The shareable URL with encoded capsule data
+     */
+    generateCapsuleLink(capsuleData) {
         try {
-            // Convert to string
+            // Convert the capsule data to a JSON string
             const dataStr = JSON.stringify(capsuleData);
             
-            // Try to use localStorage
-            const shortId = await cryptoManager.generateShortHash(dataStr);
+            // Encode the JSON string to base64
+            const encodedData = btoa(encodeURIComponent(dataStr));
             
-            // Store in localStorage
-            localStorage.setItem(`capsule_${shortId}`, dataStr);
-            
-            return shortId;
+            // Create the URL with the encoded data in the hash
+            const baseUrl = window.location.href.split('#')[0];
+            return `${baseUrl}#${encodedData}`;
         } catch (error) {
-            console.error('Failed to store capsule:', error);
-            alert('Failed to create capsule. Please try again.');
-            throw error;
+            console.error('Failed to generate capsule link:', error);
+            alert('Failed to create capsule link. The data might be too large.');
+            return window.location.href;
         }
-    }
-    
-    generateCapsuleLink(capsuleId) {
-        // Use URL fragment for sharing
-        const baseUrl = window.location.href.split('#')[0];
-        return `${baseUrl}#capsule=${capsuleId}`;
     }
     
     copyLink() {
@@ -223,7 +217,7 @@ class TimeCapsuleApp {
         
         const downloadLink = document.createElement('a');
         downloadLink.setAttribute('href', dataUri);
-        downloadLink.setAttribute('download', `unwraplater_capsule_${this.currentCapsule.id}.json`);
+        downloadLink.setAttribute('download', `unwraplater_capsule.json`);
         document.body.appendChild(downloadLink);
         
         // Trigger download
@@ -233,29 +227,47 @@ class TimeCapsuleApp {
         document.body.removeChild(downloadLink);
     }
     
+    /**
+     * Check if the URL contains a capsule in the hash
+     * If found, attempt to decode and load it
+     */
     checkForCapsuleInUrl() {
         const hash = window.location.hash;
-        if (hash && hash.includes('capsule=')) {
-            const capsuleId = hash.split('capsule=')[1];
-            this.loadCapsule(capsuleId);
+        if (hash && hash.length > 1) {
+            // Remove the # symbol and try to decode
+            const encodedData = hash.substring(1);
+            this.decodeCapsuleFromHash(encodedData);
         }
     }
     
-    async loadCapsule(capsuleId) {
+    /**
+     * Decode capsule data from a URL hash
+     * @param {string} encodedData - Base64 encoded capsule data
+     */
+    decodeCapsuleFromHash(encodedData) {
         try {
-            // Try to load from localStorage
-            const dataStr = localStorage.getItem(`capsule_${capsuleId}`);
-            if (!dataStr) {
-                alert('Capsule not found. It may have expired or been deleted.');
-                return;
-            }
+            // Decode the base64 string to a JSON string
+            const jsonStr = decodeURIComponent(atob(encodedData));
             
-            // Parse capsule data
-            const capsuleData = JSON.parse(dataStr);
+            // Parse the JSON string to get the capsule data
+            const capsuleData = JSON.parse(jsonStr);
             
+            // Process the capsule data
+            this.processCapsuleData(capsuleData);
+        } catch (error) {
+            console.error('Failed to decode capsule data:', error);
+            alert('Capsule not found or invalid. The link might be corrupted.');
+        }
+    }
+    
+    /**
+     * Process the decoded capsule data
+     * @param {Object} capsuleData - The decoded capsule data
+     */
+    processCapsuleData(capsuleData) {
+        try {
             // Store for access in unlock process
             this.currentCapsule = {
-                id: capsuleId,
                 data: capsuleData
             };
             
@@ -289,8 +301,8 @@ class TimeCapsuleApp {
             // Show unlock view
             this.showView(this.unlockView);
         } catch (error) {
-            console.error('Failed to load capsule:', error);
-            alert('Failed to load capsule. It may be corrupted or invalid.');
+            console.error('Failed to process capsule data:', error);
+            alert('Failed to load capsule. The capsule data might be corrupted.');
         }
     }
     

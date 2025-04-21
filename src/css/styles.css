@@ -73,6 +73,21 @@ header h1 {
     display: inline-block;
 }
 
+.subtitle {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+.note {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 0.5rem 0;
+    font-style: italic;
+    color: var(--primary-color);
+}
+
 .theme-toggle {
     position: absolute;
     top: 0;
