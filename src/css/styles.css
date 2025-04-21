@@ -899,4 +899,57 @@ footer a:hover {
     #revealed-message {
         color: black !important;
     }
+}
+
+/* ==========================================================================
+   Open Now Button for time capsules
+   ========================================================================== */
+
+.open-now-container {
+    margin: var(--space-lg) 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-base);
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: var(--radius);
+    border: 1px dashed var(--border-color);
+    transition: var(--transition);
+}
+
+body.dark-mode .open-now-container {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.open-now-container .note {
+    margin-bottom: var(--space-sm);
+    text-align: center;
+    font-weight: 500;
+}
+
+.open-now-container .btn {
+    min-width: 150px;
+}
+
+/* Hover effect for the container */
+.open-now-container:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: var(--primary-color);
+}
+
+body.dark-mode .open-now-container:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+@media (min-width: 600px) {
+    .open-now-container {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: var(--space-md) var(--space-lg);
+    }
+    
+    .open-now-container .note {
+        margin-bottom: 0;
+        text-align: left;
+    }
 } 
