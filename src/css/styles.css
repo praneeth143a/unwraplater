@@ -774,4 +774,46 @@ footer a:hover {
     #revealed-message {
         color: black !important;
     }
+}
+
+/* ==========================================================================
+   URL Controls
+   Styling for URL shortening options
+   ========================================================================== */
+
+.url-controls {
+    margin-top: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.url-note {
+    font-size: var(--fs-xs);
+    opacity: 0.7;
+    font-style: italic;
+}
+
+.btn.link-action {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: none;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--fs-sm);
+    min-height: auto;
+    text-decoration: underline;
+}
+
+.btn.link-action:hover {
+    color: var(--primary-hover);
+    background-color: transparent;
+}
+
+/* Adjust URL controls for larger screens */
+@media (min-width: 600px) {
+    .url-controls {
+        flex-direction: row;
+        justify-content: space-between;
+    }
 } 

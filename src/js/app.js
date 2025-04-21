@@ -25,6 +25,9 @@ class TimeCapsuleApp {
         this.capsuleContent = document.getElementById('capsule-content');
         this.revealedMessage = document.getElementById('revealed-message');
         
+        // URL Shortening preference
+        this.useShortUrls = localStorage.getItem('useShortUrls') !== 'false'; // Default to true
+        
         // Button handlers
         this.setupButtonHandlers();
         
@@ -39,6 +42,9 @@ class TimeCapsuleApp {
         
         // Initialize countdown timer
         this.countdown = null;
+        
+        // Clean up expired capsules from localStorage
+        URLShortener.cleanupExpiredCapsules(30); // Clean up capsules older than 30 days
     }
     
     setupButtonHandlers() {
@@ -62,6 +68,32 @@ class TimeCapsuleApp {
         
         // Create new from unlock view button
         document.getElementById('create-new-from-unlock').addEventListener('click', () => this.showCreateView());
+        
+        // Toggle URL shortening button (if present in HTML)
+        const toggleUrlBtn = document.getElementById('toggle-url-type');
+        if (toggleUrlBtn) {
+            toggleUrlBtn.addEventListener('click', () => this.toggleUrlType());
+        }
+    }
+    
+    // Toggle between short and long URL formats
+    toggleUrlType() {
+        this.useShortUrls = !this.useShortUrls;
+        localStorage.setItem('useShortUrls', this.useShortUrls);
+        
+        // If we have a current capsule, regenerate the link
+        if (this.currentCapsule && this.capsuleLinkInput) {
+            this.generateCapsuleLink(this.currentCapsule.data)
+                .then(link => {
+                    this.capsuleLinkInput.value = link;
+                });
+        }
+        
+        // Update toggle button text if it exists
+        const toggleUrlBtn = document.getElementById('toggle-url-type');
+        if (toggleUrlBtn) {
+            toggleUrlBtn.textContent = this.useShortUrls ? 'Use Long URL' : 'Use Short URL';
+        }
     }
     
     setDefaultUnlockTime() {
@@ -107,8 +139,8 @@ class TimeCapsuleApp {
     
     showCreateView() {
         this.showView(this.createView);
-        // Clear URL fragment
-        history.pushState("", document.title, window.location.pathname + window.location.search);
+        // Clear URL parameters and fragment
+        history.pushState("", document.title, window.location.pathname);
     }
     
     async createCapsule() {
@@ -160,25 +192,31 @@ class TimeCapsuleApp {
             }
         }
         
-        // Generate and display the capsule link by embedding the data in the URL
-        const capsuleLink = this.generateCapsuleLink(capsuleData);
-        this.capsuleLinkInput.value = capsuleLink;
-        
-        // Store the current capsule for download
-        this.currentCapsule = {
-            data: capsuleData
-        };
-        
-        // Show result view
-        this.showView(this.resultView);
+        // Generate and display the capsule link
+        try {
+            const capsuleLink = await this.generateCapsuleLink(capsuleData);
+            this.capsuleLinkInput.value = capsuleLink;
+            
+            // Store the current capsule for download
+            this.currentCapsule = {
+                data: capsuleData
+            };
+            
+            // Show result view
+            this.showView(this.resultView);
+        } catch (error) {
+            console.error('Failed to generate capsule link:', error);
+            alert('Failed to create capsule link. Please try again.');
+        }
     }
     
     /**
-     * Generate a shareable link by encoding the capsule data into the URL hash
+     * Generate a shareable link for the capsule data
+     * Uses URL shortener if enabled, otherwise falls back to hash-based URLs
      * @param {Object} capsuleData - The capsule data object
-     * @returns {string} - The shareable URL with encoded capsule data
+     * @returns {Promise<string>} - The shareable URL
      */
-    generateCapsuleLink(capsuleData) {
+    async generateCapsuleLink(capsuleData) {
         try {
             // Convert the capsule data to a JSON string
             const dataStr = JSON.stringify(capsuleData);
@@ -186,13 +224,19 @@ class TimeCapsuleApp {
             // Encode the JSON string to base64
             const encodedData = btoa(encodeURIComponent(dataStr));
             
-            // Create the URL with the encoded data in the hash
-            const baseUrl = window.location.href.split('#')[0];
-            return `${baseUrl}#${encodedData}`;
+            if (this.useShortUrls) {
+                // Use URL shortener
+                return await URLShortener.generateShortUrl(encodedData, false); // Pass false to use internal shortening
+            } else {
+                // Use the original URL hash method
+                const baseUrl = window.location.href.split('#')[0].split('?')[0]; // Remove any existing hash or query
+                return `${baseUrl}#${encodedData}`;
+            }
         } catch (error) {
             console.error('Failed to generate capsule link:', error);
-            alert('Failed to create capsule link. The data might be too large.');
-            return window.location.href;
+            // Fall back to original URL method
+            const baseUrl = window.location.href.split('#')[0].split('?')[0];
+            return `${baseUrl}#${encodedData}`;
         }
     }
     
@@ -232,23 +276,23 @@ class TimeCapsuleApp {
     }
     
     /**
-     * Check if the URL contains a capsule in the hash
-     * If found, attempt to decode and load it
+     * Check if the URL contains a capsule data
+     * First checks for short URL ID in query param, then falls back to hash
      */
     checkForCapsuleInUrl() {
-        const hash = window.location.hash;
-        if (hash && hash.length > 1) {
-            // Remove the # symbol and try to decode
-            const encodedData = hash.substring(1);
-            this.decodeCapsuleFromHash(encodedData);
+        // Use the URLShortener to parse the current URL
+        const encodedData = URLShortener.parseCurrentUrl();
+        
+        if (encodedData) {
+            this.decodeCapsuleFromData(encodedData);
         }
     }
     
     /**
-     * Decode capsule data from a URL hash
+     * Decode capsule data from encoded string
      * @param {string} encodedData - Base64 encoded capsule data
      */
-    decodeCapsuleFromHash(encodedData) {
+    decodeCapsuleFromData(encodedData) {
         try {
             // Decode the base64 string to a JSON string
             const jsonStr = decodeURIComponent(atob(encodedData));
