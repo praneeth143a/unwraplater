@@ -601,10 +601,16 @@ footer {
 }
 
 footer p {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-xs);
+    margin-bottom: var(--space-xs);
+    line-height: 1.5;
+}
+
+footer p:first-child {
+    font-weight: 500;
+}
+
+footer p:last-child {
+    opacity: 0.8;
 }
 
 footer a {
