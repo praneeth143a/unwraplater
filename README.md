@@ -11,9 +11,9 @@ UnwrapLater is a web application that lets you create beautiful time capsule mes
 - Custom Theme lets users define background color/image, font style, and optional animation
 
 ### ⏳ Real-Time Unlock Timer
-- If the selected unlock time is more than 1 minute from now, a real-time countdown timer appears
-- Unlocks only when the timer hits zero
-- If less than a minute, unlocks instantly
+- Set a time in the future (at least 1 minute) when your message can be accessed
+- A real-time countdown timer appears until the unlock time
+- Message automatically reveals when the timer hits zero
 
 ### 🔒 Security & URL-Based Storage
 - All logic runs on the client-side (no server required)
@@ -30,15 +30,15 @@ UnwrapLater is a web application that lets you create beautiful time capsule mes
 ### 🧪 Bonus Features
 - Ability to export/download capsule (JSON)
 - Canvas/SVG-based particles and confetti (efficient, responsive)
-- Drag-to-reveal interactions for message opening
 
 ## Getting Started
 
 1. Open `index.html` in any modern web browser
 2. Create your time capsule message
-3. Set the unlock time and choose a theme
-4. Click "Create Time Capsule"
-5. Share the generated link with others
+3. Set the unlock time (at least 1 minute in the future)
+4. Choose a theme
+5. Click "Create Time Capsule"
+6. Share the generated link with others
 
 No server or installation required! All data is stored directly in the URL.
 

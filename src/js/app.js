@@ -28,7 +28,7 @@ class TimeCapsuleApp {
         // Button handlers
         this.setupButtonHandlers();
         
-        // Set default unlock time (1 hour from now)
+        // Set default unlock time (1 minute from now)
         this.setDefaultUnlockTime();
         
         // Check if there's a capsule in the URL
@@ -66,7 +66,8 @@ class TimeCapsuleApp {
     
     setDefaultUnlockTime() {
         const now = new Date();
-        now.setHours(now.getHours() + 1);
+        // Set default to 1 minute from now instead of 1 hour
+        now.setMinutes(now.getMinutes() + 1);
         
         // Format for datetime-local input (YYYY-MM-DDThh:mm)
         const year = now.getFullYear();
@@ -126,8 +127,11 @@ class TimeCapsuleApp {
         
         const unlockTime = new Date(unlockTimeStr).getTime();
         const now = Date.now();
-        if (unlockTime < now) {
-            alert('Unlock time must be in the future.');
+        
+        // Check if unlock time is at least 1 minute in the future
+        const oneMinute = 60 * 1000; // 1 minute in milliseconds
+        if (unlockTime < now + oneMinute) {
+            alert('Unlock time must be at least 1 minute in the future.');
             return;
         }
         
@@ -408,67 +412,6 @@ class TimeCapsuleApp {
                 animationManager.burstConfetti(centerX, centerY, 100);
             }
         }
-        
-        // Add drag-to-reveal interaction
-        this.setupDragToReveal();
-    }
-    
-    setupDragToReveal() {
-        const messageContainer = document.querySelector('.message-container');
-        
-        // Check if already has a cover
-        if (messageContainer.querySelector('.draggable-cover')) {
-            return;
-        }
-        
-        // Create draggable cover
-        const cover = document.createElement('div');
-        cover.className = 'draggable-cover';
-        cover.textContent = 'Drag to reveal message';
-        messageContainer.appendChild(cover);
-        
-        // Drag interaction
-        let isDragging = false;
-        let startY, startTop;
-        
-        cover.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            cover.classList.add('dragging');
-            startY = e.clientY;
-            startTop = 0;
-            e.preventDefault();
-        });
-        
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            
-            const deltaY = e.clientY - startY;
-            const newTop = Math.max(0, Math.min(messageContainer.offsetHeight, startTop + deltaY));
-            cover.style.height = `${messageContainer.offsetHeight - newTop}px`;
-            
-            // Remove cover if dragged more than 80% down
-            if (newTop > messageContainer.offsetHeight * 0.8) {
-                messageContainer.removeChild(cover);
-                isDragging = false;
-            }
-        });
-        
-        document.addEventListener('mouseup', () => {
-            if (!isDragging) return;
-            
-            isDragging = false;
-            cover.classList.remove('dragging');
-            
-            // Snap back to top or remove based on position
-            const coverRect = cover.getBoundingClientRect();
-            const containerRect = messageContainer.getBoundingClientRect();
-            
-            if (coverRect.top > containerRect.top + containerRect.height * 0.5) {
-                messageContainer.removeChild(cover);
-            } else {
-                cover.style.height = '100%';
-            }
-        });
     }
     
     setupThemeToggle() {
