@@ -1,0 +1,389 @@
+:root {
+    --primary-color: #6b46c1;
+    --primary-hover: #553c9a;
+    --secondary-color: #4299e1;
+    --light-bg: #f7fafc;
+    --light-card: #ffffff;
+    --light-text: #2d3748;
+    --light-border: #e2e8f0;
+    --dark-bg: #1a202c;
+    --dark-card: #2d3748;
+    --dark-text: #f7fafc;
+    --dark-border: #4a5568;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --radius: 8px;
+    --font-main: 'Poppins', sans-serif;
+    --transition: all 0.3s ease;
+    
+    /* Default theme is light */
+    --bg-color: var(--light-bg);
+    --card-bg: var(--light-card);
+    --text-color: var(--light-text);
+    --border-color: var(--light-border);
+}
+
+/* Dark Mode */
+body.dark-mode {
+    --bg-color: var(--dark-bg);
+    --card-bg: var(--dark-card);
+    --text-color: var(--dark-text);
+    --border-color: var(--dark-border);
+}
+
+/* Theme-specific variables will be set by JavaScript */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    transition: var(--transition);
+    min-height: 100vh;
+}
+
+.app-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.light-mode, .dark-mode {
+    padding: 0.5rem;
+    transition: var(--transition);
+}
+
+body:not(.dark-mode) .light-mode {
+    opacity: 1;
+}
+
+body:not(.dark-mode) .dark-mode {
+    opacity: 0.5;
+}
+
+body.dark-mode .light-mode {
+    opacity: 0.5;
+}
+
+body.dark-mode .dark-mode {
+    opacity: 1;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: var(--transition);
+}
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+h2 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-family: var(--font-main);
+    font-size: 1rem;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    transition: var(--transition);
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(107, 70, 193, 0.2);
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font-main);
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    flex: 1;
+}
+
+.btn.primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn.primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn.secondary {
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn.secondary:hover {
+    background-color: rgba(107, 70, 193, 0.1);
+}
+
+.hidden {
+    display: none;
+}
+
+/* Theme Preview */
+.theme-preview {
+    margin: 1.5rem 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.preview-container {
+    position: relative;
+    padding: 1rem;
+    min-height: 100px;
+    /* Theme-specific background will be set by JavaScript */
+}
+
+.preview-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-bottom-right-radius: var(--radius);
+}
+
+/* Capsule Link */
+.link-container {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.link-container input {
+    flex: 1;
+}
+
+.link-container button {
+    flex: none;
+}
+
+/* Countdown Timer */
+.countdown-timer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.time-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.time-unit span {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.time-unit .label {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-top: 0.25rem;
+}
+
+/* Message reveal */
+.message-container {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: var(--radius);
+    margin: 1.5rem 0;
+    position: relative;
+    overflow: hidden;
+    /* Theme-specific styling will be applied by JavaScript */
+}
+
+#revealed-message {
+    font-size: 1.25rem;
+    text-align: center;
+    white-space: pre-wrap;
+}
+
+footer {
+    text-align: center;
+    margin-top: 3rem;
+    opacity: 0.7;
+    font-size: 0.875rem;
+}
+
+footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Canvas for animations */
+#animation-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 1rem;
+    }
+    
+    .card {
+        padding: 1.5rem;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .countdown-timer {
+        gap: 0.5rem;
+    }
+    
+    .time-unit span {
+        font-size: 1.5rem;
+    }
+}
+
+/* Theme specific classes will be added by JavaScript */
+/* Love Theme */
+.theme-love {
+    --theme-primary: #ff4d6d;
+    --theme-secondary: #ff8fa3;
+    --theme-bg: linear-gradient(135deg, #ff8fa3, #ff4d6d);
+    --theme-font: 'Poppins', sans-serif;
+}
+
+/* Best Friends Theme */
+.theme-friendship {
+    --theme-primary: #4f46e5;
+    --theme-secondary: #818cf8;
+    --theme-bg: linear-gradient(135deg, #818cf8, #4f46e5);
+    --theme-font: 'Poppins', sans-serif;
+}
+
+/* Birthday Theme */
+.theme-birthday {
+    --theme-primary: #f59e0b;
+    --theme-secondary: #fbbf24;
+    --theme-bg: linear-gradient(135deg, #fbbf24, #f59e0b);
+    --theme-font: 'Poppins', sans-serif;
+}
+
+/* Celebration Theme */
+.theme-celebration {
+    --theme-primary: #10b981;
+    --theme-secondary: #34d399;
+    --theme-bg: linear-gradient(135deg, #34d399, #10b981);
+    --theme-font: 'Poppins', sans-serif;
+}
+
+/* Drag to reveal interactions */
+.draggable-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    transition: var(--transition);
+    z-index: 5;
+    border-radius: var(--radius);
+}
+
+.dragging {
+    cursor: grabbing;
+    opacity: 0.8;
+} 
