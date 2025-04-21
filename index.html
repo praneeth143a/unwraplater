@@ -108,14 +108,14 @@
                     <h2>Your Time Capsule is Ready!</h2>
                     <div class="capsule-link-area">
                         <p>Share this link:</p>
-                        <p class="note">The URL contains everything needed to access your capsule.</p>
+                        <p class="note">The entire message data is contained in this URL - no need for any servers!</p>
                         <div class="link-container">
                             <input type="text" id="capsule-link" readonly aria-label="Capsule link">
                             <button id="copy-link" class="btn secondary">Copy</button>
-                        </div>
-                        <div class="url-controls">
-                            <button id="toggle-url-type" class="btn link-action">Use Long URL</button>
-                            <p class="url-note">Short URLs are saved locally in your browser.</p>
+                            <div class="url-format-toggle">
+                                <input type="checkbox" id="url-format-toggle" checked>
+                                <label for="url-format-toggle">Use full URL (recommended for sharing)</label>
+                            </div>
                         </div>
                     </div>
                     <div class="button-group">
@@ -186,7 +186,6 @@
     <script src="src/js/crypto.js"></script>
     <script src="src/js/animations.js"></script>
     <script src="src/js/themes.js"></script>
-    <script src="src/js/url-shortener.js"></script>
     <script src="src/js/app.js"></script>
 </body>
 </html>

@@ -46,7 +46,21 @@ class TimeCapsuleApp {
         document.getElementById('create-capsule').addEventListener('click', () => this.createCapsule());
         
         // Copy link button
-        document.getElementById('copy-link').addEventListener('click', () => this.copyLink());
+        document.getElementById('copy-link').addEventListener('click', () => {
+            const useLongUrl = document.getElementById('url-format-toggle').checked;
+            this.copyLink(useLongUrl);
+        });
+        
+        // URL format toggle
+        const urlFormatToggle = document.getElementById('url-format-toggle');
+        urlFormatToggle.addEventListener('change', () => {
+            const useLongUrl = urlFormatToggle.checked;
+            // Update the link display immediately when the toggle changes
+            if (this.currentCapsule) {
+                const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, useLongUrl);
+                this.capsuleLinkInput.value = capsuleLink;
+            }
+        });
         
         // Download capsule button
         document.getElementById('download-capsule').addEventListener('click', () => this.downloadCapsule());
@@ -167,7 +181,8 @@ class TimeCapsuleApp {
         }
         
         // Generate and display the capsule link by embedding the data in the URL
-        const capsuleLink = this.generateCapsuleLink(capsuleData);
+        const useLongUrl = document.getElementById('url-format-toggle').checked;
+        const capsuleLink = this.generateCapsuleLink(capsuleData, useLongUrl);
         this.capsuleLinkInput.value = capsuleLink;
         
         // Store the current capsule for download
@@ -182,9 +197,10 @@ class TimeCapsuleApp {
     /**
      * Generate a shareable link by encoding the capsule data into the URL hash
      * @param {Object} capsuleData - The capsule data object
+     * @param {boolean} useLongUrl - Whether to use a full URL with origin (true) or just a relative URL (false)
      * @returns {string} - The shareable URL with encoded capsule data
      */
-    generateCapsuleLink(capsuleData) {
+    generateCapsuleLink(capsuleData, useLongUrl = true) {
         try {
             // Convert the capsule data to a JSON string
             const dataStr = JSON.stringify(capsuleData);
@@ -192,13 +208,15 @@ class TimeCapsuleApp {
             // Use encodeURIComponent before btoa to handle Unicode characters properly
             const encodedData = this.safeBase64Encode(dataStr);
             
-            // Use a full absolute URL instead of relative one to ensure it works across devices
-            // Get the current origin (protocol + hostname + port)
-            const origin = window.location.origin;
-            const pathname = window.location.pathname;
-            
-            // Create the URL with the encoded data in the hash
-            return `${origin}${pathname}#${encodedData}`;
+            if (useLongUrl) {
+                // Use a full absolute URL with origin for cross-device sharing
+                const origin = window.location.origin;
+                const pathname = window.location.pathname;
+                return `${origin}${pathname}#${encodedData}`;
+            } else {
+                // Use a relative URL for local sharing or when a shorter URL is desired
+                return `#${encodedData}`;
+            }
         } catch (error) {
             console.error('Failed to generate capsule link:', error);
             alert('Failed to create capsule link. The data might be too large.');
@@ -247,10 +265,18 @@ class TimeCapsuleApp {
         }
     }
     
-    copyLink() {
+    /**
+     * Copy the capsule link to clipboard
+     * @param {boolean} useLongUrl - Whether to use a full URL (true) or relative URL (false)
+     */
+    copyLink(useLongUrl = true) {
+        // Generate the link with the specified URL format
+        const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, useLongUrl);
+        this.capsuleLinkInput.value = capsuleLink;
+        
         // Modern clipboard API when available
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(this.capsuleLinkInput.value)
+            navigator.clipboard.writeText(capsuleLink)
                 .then(() => {
                     // Show success feedback
                     const copyBtn = document.getElementById('copy-link');

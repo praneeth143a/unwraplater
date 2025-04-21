@@ -448,6 +448,45 @@ textarea {
     width: 100%;
 }
 
+.url-format-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--fs-sm);
+    margin-top: var(--space-xs);
+}
+
+.url-format-toggle input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--primary-color);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.url-format-toggle input[type="checkbox"]:checked {
+    background-color: var(--primary-color);
+}
+
+.url-format-toggle input[type="checkbox"]:checked::before {
+    content: "✓";
+    position: absolute;
+    color: white;
+    font-size: 12px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.url-format-toggle label {
+    cursor: pointer;
+    color: var(--text-color-secondary);
+}
+
 /* ==========================================================================
    Countdown Timer Component
    ========================================================================== */
