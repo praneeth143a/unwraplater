@@ -42,6 +42,10 @@ UnwrapLater is a web application that lets you create beautiful time capsule mes
 
 No server or installation is required! All data is stored in the browser's localStorage.
 
+## Demo
+
+You can try the application at [https://your-username.github.io/unwraplater](https://your-username.github.io/unwraplater)
+
 ## Technical Details
 
 - Built with vanilla JavaScript, HTML, and CSS
@@ -57,6 +61,16 @@ This application works best in modern browsers that support the Web Crypto API a
 - Firefox (latest)
 - Safari (latest)
 - Edge (latest)
+
+## Contributing
+
+Contributions are welcome! Here's how you can contribute:
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b my-new-feature`
+3. Commit your changes: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin my-new-feature`
+5. Submit a pull request
 
 ## License
 
