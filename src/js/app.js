@@ -202,10 +202,16 @@ class TimeCapsuleApp {
         const unlockTime = new Date(unlockTimeStr).getTime();
         const now = Date.now();
         
-        // Check if unlock time is at least 1 minute in the future
-        const oneMinute = 60 * 1000; // 1 minute in milliseconds
-        if (unlockTime < now + oneMinute) {
-            alert('Unlock time must be at least 1 minute in the future.');
+        // Check if unlock time is in the past (comparing by minute)
+        const unlockDate = new Date(unlockTime);
+        const currentDate = new Date(now);
+        
+        // Remove hours, minutes, seconds for comparison to the minute
+        unlockDate.setSeconds(0, 0);
+        currentDate.setSeconds(0, 0);
+        
+        if (unlockDate < currentDate) {
+            alert('You can only unlock the capsule at the exact set time or future time.');
             return;
         }
         
@@ -445,11 +451,19 @@ class TimeCapsuleApp {
                 themesManager.loadThemeFromData(capsuleData.theme);
             }
             
-            // Check if it's time to unlock
+            // Check if it's time to unlock (comparing by minute)
             const now = Date.now();
             const unlockTime = capsuleData.unlockTime;
             
-            if (unlockTime > now) {
+            const unlockDate = new Date(unlockTime);
+            const currentDate = new Date(now);
+            
+            // Remove seconds and milliseconds for comparison to the minute
+            unlockDate.setSeconds(0, 0);
+            currentDate.setSeconds(0, 0);
+            
+            // Check if current time matches unlock time or is after unlock time
+            if (unlockDate > currentDate) {
                 // Not yet time to unlock
                 this.setupCountdown(unlockTime);
                 this.timerContainer.classList.remove('hidden');
@@ -569,7 +583,16 @@ class TimeCapsuleApp {
             const now = Date.now();
             const timeLeft = unlockTime - now;
             
-            if (timeLeft <= 0) {
+            // Check unlock by comparing dates to the minute
+            const unlockDate = new Date(unlockTime);
+            const currentDate = new Date(now);
+            
+            // Remove seconds and milliseconds for comparison to the minute
+            unlockDate.setSeconds(0, 0);
+            currentDate.setSeconds(0, 0);
+            
+            // Check if current time matches or exceeds unlock time
+            if (currentDate.getTime() >= unlockDate.getTime()) {
                 // Time's up, clear countdown and show message
                 clearInterval(this.countdown);
                 this.timerContainer.classList.add('hidden');
