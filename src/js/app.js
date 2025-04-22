@@ -699,9 +699,7 @@ class TimeCapsuleApp {
     }
     
     setupThemeToggle() {
-        const toggleElement = document.querySelector('.theme-toggle');
-        const lightModeBtn = toggleElement.querySelector('.light-mode');
-        const darkModeBtn = toggleElement.querySelector('.dark-mode');
+        const toggleButton = document.querySelector('.theme-toggle');
         
         // Check if dark mode is preferred or previously set
         const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -712,7 +710,7 @@ class TimeCapsuleApp {
         }
         
         // Toggle dark mode
-        toggleElement.addEventListener('click', () => {
+        toggleButton.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         });

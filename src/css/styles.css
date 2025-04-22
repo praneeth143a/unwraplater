@@ -158,35 +158,69 @@ header p {
 
 .theme-toggle {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 10px;
+    right: 10px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
     cursor: pointer;
-    font-size: var(--fs-lg);
     display: flex;
     align-items: center;
-    border-radius: 50%;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
     overflow: hidden;
+    padding: 0;
+    outline: none;
 }
 
-.light-mode, .dark-mode {
-    padding: var(--space-sm);
+.theme-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+.toggle-icon {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: var(--transition);
 }
 
-body:not(.dark-mode) .light-mode {
-    opacity: 1;
+.sun-moon {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    transition: all 0.3s ease;
 }
 
-body:not(.dark-mode) .dark-mode {
-    opacity: 0.5;
+/* Sun rays in light mode */
+.sun-moon::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    top: 0;
+    left: 0;
+    background-color: var(--card-bg); 
+    border-radius: 50%;
+    transform: scale(1);
+    transition: all 0.3s ease;
 }
 
-body.dark-mode .light-mode {
-    opacity: 0.5;
+/* Moon shape in dark mode */
+body.dark-mode .sun-moon::before {
+    transform: scale(0.75) translateX(7px);
 }
 
-body.dark-mode .dark-mode {
-    opacity: 1;
+body.dark-mode .toggle-icon {
+    transform: rotate(40deg);
 }
 
 /* Card component - holds each view */
