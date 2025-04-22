@@ -655,6 +655,12 @@ class TimeCapsuleApp {
         // Show message container
         this.capsuleContent.classList.remove('hidden');
         
+        // Hide the Open Now button if it exists
+        const openNowContainer = document.getElementById('open-now-container');
+        if (openNowContainer) {
+            openNowContainer.classList.add('hidden');
+        }
+        
         // Start animation if not already started
         if (!animationManager.isActive) {
             const currentTheme = themesManager.getCurrentTheme();

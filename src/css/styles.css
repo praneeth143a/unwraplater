@@ -1073,4 +1073,77 @@ body.dark-mode textarea.exceeded {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+/* ==========================================================================
+   Custom Color Picker
+   ========================================================================== */
+
+input[type="color"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    position: relative;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+    padding: 0;
+}
+
+input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 50%;
+    padding: 0;
+}
+
+input[type="color"]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+input[type="color"]:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+input[type="color"]:focus {
+    outline: none;
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.3);
+}
+
+/* Container for color picker */
+.color-picker-container {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.color-picker-container label {
+    margin-bottom: 0;
 } 
