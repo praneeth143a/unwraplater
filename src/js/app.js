@@ -546,7 +546,7 @@ class TimeCapsuleApp {
         this.timerContainer.classList.add('hidden');
         const openNowContainer = document.getElementById('open-now-container');
         if (openNowContainer) {
-            openNowContainer.classList.add('hidden');
+            openNowContainer.parentNode.removeChild(openNowContainer);
         }
         
         // Check if passphrase is required
@@ -597,10 +597,10 @@ class TimeCapsuleApp {
                 clearInterval(this.countdown);
                 this.timerContainer.classList.add('hidden');
                 
-                // Also hide the open now button if it exists
+                // Remove the open now container from the DOM
                 const openNowContainer = document.getElementById('open-now-container');
                 if (openNowContainer) {
-                    openNowContainer.classList.add('hidden');
+                    openNowContainer.parentNode.removeChild(openNowContainer);
                 }
                 
                 // Check if passphrase required
@@ -678,10 +678,10 @@ class TimeCapsuleApp {
         // Show message container
         this.capsuleContent.classList.remove('hidden');
         
-        // Hide the Open Now button if it exists
+        // Remove the Open Now container from the DOM
         const openNowContainer = document.getElementById('open-now-container');
         if (openNowContainer) {
-            openNowContainer.classList.add('hidden');
+            openNowContainer.parentNode.removeChild(openNowContainer);
         }
         
         // Start animation if not already started
