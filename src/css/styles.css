@@ -8,7 +8,7 @@
     --primary-color: #6b46c1;
     --primary-hover: #553c9a;
     --secondary-color: #4299e1;
-    --light-bg: #f8fafc;
+    --light-bg: #e0f7ff; /* Sky blue background for light mode */
     --light-card: #ffffff;
     --light-text: #1e293b;
     --light-border: #e2e8f0;
@@ -193,7 +193,7 @@ body.dark-mode .dark-mode {
 .card {
     background-color: var(--card-bg);
     border-radius: var(--radius);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.08);
     padding: var(--space-lg);
     margin-bottom: var(--space-lg);
     transition: var(--transition);
