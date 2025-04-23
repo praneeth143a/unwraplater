@@ -1,89 +1,105 @@
-# UnwrapLater - Time Capsule Messages
+# 🎁 UnwrapLater – Time Capsule Messages
 
-UnwrapLater is a web application that lets you create beautiful time capsule messages that can only be opened at a specific time. Create messages for special occasions, surprise loved ones, or send future you a note!
+**UnwrapLater** is a beautifully crafted web app that lets you send time-locked messages to your future self, loved ones, or friends. Whether it's a birthday surprise, a motivational boost, or a heartfelt note, your message will stay sealed until the moment is right.
 
-## Features
+## 🚀 Why UnwrapLater?
+
+- No server, no signups — just a lightweight, fully client-side experience.
+- Shareable links that work on any device.
+- Unique themed animations to match every mood.
+- A fun, meaningful way to send moments into the future.
+
+---
+
+## ✨ Features
 
 ### 🎭 Themed Animations
-- **User-selectable themes**: 💖 Love, 🤝 Best Friends, 🎂 Birthday, 🎉 Celebration, plus a Custom Theme option
-- Each theme includes a unique canvas/CSS animation, background, and color scheme
-- Confetti effects for Love, Birthday, and Celebration themes
-- Custom Theme lets users define background color/image, font style, and optional animation
+- Choose from preset themes: 💖 Love, 🤝 Best Friends, 🎂 Birthday, 🎉 Celebration, or create your own!
+- Each theme includes a custom background, color scheme, and animated effects.
+- Confetti, floating hearts, sparkles, and more — all done with canvas or CSS for performance.
+- Custom Theme lets users define their own background, font, and animations.
 
 ### ⏳ Real-Time Unlock Timer
-- Set a time in the future (at least 1 minute) when your message can be accessed
-- A real-time countdown timer appears until the unlock time
-- Message automatically reveals when the timer hits zero
+- Set any unlock date and time — even right now!
+- If the time is in the future, a live countdown will appear.
+- The message is automatically revealed when the time arrives — no user action required.
 
-### 🔒 Security & URL-Based Storage
-- All logic runs on the client-side (no server required)
-- Messages can be encrypted using Web Crypto API when a passphrase is used
-- **Capsule data is embedded directly in the URL** (using base64 encoding in the URL fragment)
-- Share links work on any device without requiring server storage or databases
+### 🔐 Privacy & Security
+- All logic is handled **entirely on the client-side** — nothing is ever sent to a server.
+- Messages can be encrypted using the Web Crypto API if a passphrase is provided.
+- Capsule data is embedded in the URL fragment via base64 encoding (after the `#` symbol).
+- This means the link contains everything — it works instantly across devices.
 
-### 🎨 UI/UX Features
-- Live theme preview when selecting a theme
-- Interactive preview of unlock screen before final capsule creation
-- Hover animations, smooth transitions, modern fonts, responsive layout
-- Dark/Light mode toggle
+### 🎨 Polished UI/UX
+- Responsive layout that works great on mobile, tablet, and desktop.
+- Smooth transitions, theme previews, modern fonts, and dark/light mode toggle.
+- Hover animations and delightful interactions for a joyful experience.
 
-### 🧪 Bonus Features
-- Ability to export/download capsule (JSON)
-- Canvas/SVG-based particles and confetti (efficient, responsive)
+### 📦 Extra Goodies
+- Export capsules as JSON for backup or local sharing.
+- Canvas/SVG-based effects for particles and confetti.
+- Shareable links with one-click copy + WhatsApp, Telegram, Twitter, and Email share buttons.
 
-## Getting Started
+---
 
-1. Open `index.html` in any modern web browser
-2. Create your time capsule message
-3. Set the unlock time (at least 1 minute in the future)
-4. Choose a theme
-5. Click "Create Time Capsule"
-6. Share the generated link with others
+## 🌐 Demo
 
-No server or installation required! All data is stored directly in the URL.
+Try it live here:  
+**[https://unwraplater.vercel.app](https://unwraplater.vercel.app)**
 
-## Demo
+---
 
-You can try the application at [https://your-username.github.io/unwraplater](https://your-username.github.io/unwraplater)
+## 🛠️ How It Works
 
-## Technical Details
+1. Compose your message and select a theme.
+2. Set the date and time when it should unlock.
+3. The app encodes all data into a URL-safe format.
+4. Share the generated link — it will work anywhere.
+5. When someone opens it, the message is revealed (or a countdown appears if it's still locked).
 
-- Built with vanilla JavaScript, HTML, and CSS
-- Uses the Web Crypto API for secure message encryption
-- Canvas-based animations are optimized for performance
-- All data is stored in the URL fragment (after the # symbol)
-- No external dependencies, frameworks, or servers required
+---
 
-## How It Works
+## 💻 Tech Stack
 
-1. **Creating a capsule**: When you create a time capsule, the app bundles your message, unlock time, and theme settings into a JSON object.
-2. **Embedding data**: This data is stringified, encoded to base64, and added to the URL as a fragment.
-3. **Sharing**: When you share this URL, all the capsule data travels with it - no server needed!
-4. **Decoding**: When someone opens the link, the app decodes the URL fragment to retrieve the original data.
-5. **Unlock logic**: The app checks if it's time to unlock the message yet, and either shows a countdown timer or reveals the message.
+- **Frontend**: Vanilla HTML, CSS, and JavaScript
+- **Encryption**: Web Crypto API
+- **Storage**: URL fragment with base64-encoded JSON
+- **Animations**: Canvas & CSS (zero dependencies!)
 
-## Browser Compatibility
+---
 
-This application works best in modern browsers that support the Web Crypto API and modern JavaScript features:
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
+## 🌍 Browser Support
 
-## Contributing
+Works on all modern browsers that support the Web Crypto API:
 
-Contributions are welcome! Here's how you can contribute:
+- Chrome
+- Firefox
+- Safari
+- Edge
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request
+---
 
-## License
+## 🤝 Contributing
 
-This project is open source and available under the MIT License.
+Want to improve or add a new feature? Contributions are always welcome!
 
-## Created By
+1. Fork the repo
+2. Create your branch: `git checkout -b feature/my-feature`
+3. Commit changes: `git commit -m "Add feature"`
+4. Push it: `git push origin feature/my-feature`
+5. Open a pull request 🎉
 
-Made with ❤️ by [Your Name] 
+---
+
+## 📄 License
+
+MIT License – free to use, share, and build upon.
+
+---
+
+## 👨‍💻 Created By
+
+Made with ❤️ by **Praneeth Kumar**  
+@https://praneeths.vercel.app/ 
+
+> "Where moments wait to be remembered."
