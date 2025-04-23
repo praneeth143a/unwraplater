@@ -12,6 +12,7 @@ class AnimationManager {
         this.currentAnimation = null;
         this.isActive = false;
         this.lastTime = 0;
+        this.animationFrameId = null;
         
         // Resize handler
         window.addEventListener('resize', () => this.resize());
@@ -24,21 +25,36 @@ class AnimationManager {
     }
     
     startAnimation(type) {
-        // Clear any existing animation
-        this.stopAnimation();
+        // Check if already running this animation
+        if (this.isActive && this.currentAnimation === type) {
+            return; // Already running this animation, no need to restart
+        }
         
         // Set new animation type
         this.currentAnimation = type;
-        this.isActive = true;
         
-        // Initialize particles based on animation type
+        // Only stop and clear if switching to a different animation
+        if (!this.isActive) {
+            this.clearCanvas();
+            this.isActive = true;
+        }
+        
+        // Initialize particles based on animation type if needed
         this.initializeParticles();
         
-        // Start animation loop
-        requestAnimationFrame((timestamp) => this.animate(timestamp));
+        // Start animation loop if not already running
+        if (!this.animationFrameId) {
+            this.lastTime = performance.now();
+            this.animationFrameId = requestAnimationFrame((timestamp) => this.animate(timestamp));
+        }
     }
     
     stopAnimation() {
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
+        
         this.isActive = false;
         this.particles = [];
         this.confetti = [];
@@ -46,53 +62,72 @@ class AnimationManager {
     }
     
     clearCanvas() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if (this.ctx) {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
     }
     
     initializeParticles() {
-        this.particles = [];
-        this.confetti = [];
-        
+        // Initialize particles based on animation type
         switch (this.currentAnimation) {
             case 'hearts':
-                this.initializeHearts();
+                if (this.particles.length === 0) {
+                    this.initializeHearts();
+                }
                 break;
             case 'friendship':
-                this.initializeFriendship();
+                if (this.particles.length === 0) {
+                    this.initializeFriendship();
+                }
                 break;
             case 'balloons':
-                this.initializeBalloons();
+                if (this.particles.length === 0) {
+                    this.initializeBalloons();
+                }
                 break;
             case 'fireworks':
-                this.initializeFireworks();
+                if (this.particles.length === 0) {
+                    this.initializeFireworks();
+                }
                 break;
             case 'particles':
-                this.initializeParticlesEffect();
+                if (this.particles.length === 0) {
+                    this.initializeParticlesEffect();
+                }
                 break;
             case 'sparkles':
-                this.initializeSparkles();
+                if (this.particles.length === 0) {
+                    this.initializeSparkles();
+                }
                 break;
             case 'confetti':
-                this.initializeConfetti();
+                if (this.confetti.length === 0) {
+                    this.initializeConfetti();
+                }
                 break;
         }
     }
     
     animate(timestamp) {
-        if (!this.isActive) return;
+        if (!this.isActive) {
+            this.animationFrameId = null;
+            return;
+        }
         
         // Calculate delta time for smooth animation
-        const deltaTime = timestamp - this.lastTime;
-        this.lastTime = timestamp;
+        // Use performance.now() for more accurate timing
+        const now = performance.now();
+        const deltaTime = now - this.lastTime;
+        this.lastTime = now;
         
         // Clear canvas
         this.clearCanvas();
         
-        // Update and draw particles
+        // Update and draw particles based on delta time
         this.updateParticles(deltaTime);
         
         // Request next frame
-        requestAnimationFrame((timestamp) => this.animate(timestamp));
+        this.animationFrameId = requestAnimationFrame((timestamp) => this.animate(timestamp));
     }
     
     updateParticles(deltaTime) {
@@ -556,39 +591,65 @@ class AnimationManager {
     // CONFETTI
     initializeConfetti() {
         const colors = ['#ff4d6d', '#4f46e5', '#f59e0b', '#10b981', '#8b5cf6'];
+        const MAX_CONFETTI = 150; // Limit total confetti for performance
         
-        for (let i = 0; i < 100; i++) {
-            this.confetti.push({
-                x: Math.random() * this.canvas.width,
-                y: -20 - Math.random() * 100,
-                size: 5 + Math.random() * 10,
-                speedY: 1 + Math.random() * 3,
-                speedX: (Math.random() - 0.5) * 2,
-                rotation: Math.random() * Math.PI * 2,
-                rotationSpeed: (Math.random() - 0.5) * 0.2,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                shape: Math.random() < 0.5 ? 'rect' : 'circle'
-            });
+        // Clear existing confetti
+        this.confetti = [];
+        
+        // Create initial confetti particles
+        for (let i = 0; i < MAX_CONFETTI; i++) {
+            this.confetti.push(this.createConfettiParticle(
+                Math.random() * this.canvas.width,
+                Math.random() * this.canvas.height - this.canvas.height, // Start above the canvas
+                colors[Math.floor(Math.random() * colors.length)]
+            ));
         }
     }
     
+    createConfettiParticle(x, y, color) {
+        return {
+            x: x,
+            y: y,
+            size: 5 + Math.random() * 10,
+            speedY: 1 + Math.random() * 3,
+            speedX: (Math.random() - 0.5) * 2,
+            rotation: Math.random() * Math.PI * 2,
+            rotationSpeed: (Math.random() - 0.5) * 0.2,
+            color: color,
+            shape: Math.random() < 0.6 ? 'rect' : 'circle',
+            opacity: 1,
+            // Add physics properties
+            gravity: 0.1 + Math.random() * 0.05,
+            wobble: Math.random() * 10,
+            wobbleSpeed: 0.1 + Math.random() * 0.2
+        };
+    }
+    
     updateConfetti(deltaTime) {
+        const MAX_CONFETTI = 150;
+        const colors = ['#ff4d6d', '#4f46e5', '#f59e0b', '#10b981', '#8b5cf6'];
+        
+        // Ensure we have deltaTime to prevent jumps in animation
+        const dt = deltaTime ? Math.min(deltaTime / 16, 5) : 1;
+        
         // Draw existing confetti
         for (let i = 0; i < this.confetti.length; i++) {
             const c = this.confetti[i];
             
-            // Update position and rotation
-            c.y += c.speedY;
-            c.x += c.speedX;
-            c.rotation += c.rotationSpeed;
+            // Update position with physics
+            c.speedY += c.gravity * dt;
+            c.y += c.speedY * dt;
+            c.x += c.speedX * dt;
+            c.rotation += c.rotationSpeed * dt;
             
-            // Add wobble
-            c.x += Math.sin(c.y * 0.01) * 0.5;
+            // Add wobble effect
+            c.x += Math.sin(c.y * 0.01 + c.wobble) * c.wobbleSpeed;
             
-            // Draw confetti
+            // Draw confetti with opacity
             this.ctx.save();
             this.ctx.translate(c.x, c.y);
             this.ctx.rotate(c.rotation);
+            this.ctx.globalAlpha = c.opacity;
             this.ctx.fillStyle = c.color;
             
             if (c.shape === 'rect') {
@@ -601,36 +662,37 @@ class AnimationManager {
             
             this.ctx.restore();
             
-            // Remove if out of screen
+            // Recycle confetti if it goes out of screen
             if (c.y > this.canvas.height + c.size) {
-                this.confetti.splice(i, 1);
-                i--;
+                // Reset particle position at top (create continuous effect)
+                this.confetti[i] = this.createConfettiParticle(
+                    Math.random() * this.canvas.width,
+                    -20 - Math.random() * 40, // Start above the canvas
+                    colors[Math.floor(Math.random() * colors.length)]
+                );
             }
         }
         
-        // Add new confetti
-        if (this.confetti.length < 100 && Math.random() < 0.1) {
-            const colors = ['#ff4d6d', '#4f46e5', '#f59e0b', '#10b981', '#8b5cf6'];
-            
-            this.confetti.push({
-                x: Math.random() * this.canvas.width,
-                y: -20,
-                size: 5 + Math.random() * 10,
-                speedY: 1 + Math.random() * 3,
-                speedX: (Math.random() - 0.5) * 2,
-                rotation: Math.random() * Math.PI * 2,
-                rotationSpeed: (Math.random() - 0.5) * 0.2,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                shape: Math.random() < 0.5 ? 'rect' : 'circle'
-            });
+        // Ensure we maintain a good number of confetti particles
+        // but don't exceed our performance limit
+        const missingConfetti = MAX_CONFETTI - this.confetti.length;
+        if (missingConfetti > 0) {
+            for (let i = 0; i < Math.min(missingConfetti, 5); i++) {
+                this.confetti.push(this.createConfettiParticle(
+                    Math.random() * this.canvas.width,
+                    -20, // Start above the canvas
+                    colors[Math.floor(Math.random() * colors.length)]
+                ));
+            }
         }
     }
     
     // Create a burst of confetti at a specific position
     burstConfetti(x, y, amount = 50) {
         const colors = ['#ff4d6d', '#4f46e5', '#f59e0b', '#10b981', '#8b5cf6'];
+        const MAX_BURST = Math.min(amount, 100); // Limit burst size for performance
         
-        for (let i = 0; i < amount; i++) {
+        for (let i = 0; i < MAX_BURST; i++) {
             const angle = Math.random() * Math.PI * 2;
             const speed = 1 + Math.random() * 5;
             
@@ -643,16 +705,19 @@ class AnimationManager {
                 rotation: Math.random() * Math.PI * 2,
                 rotationSpeed: (Math.random() - 0.5) * 0.2,
                 color: colors[Math.floor(Math.random() * colors.length)],
-                shape: Math.random() < 0.5 ? 'rect' : 'circle',
+                shape: Math.random() < 0.6 ? 'rect' : 'circle',
                 gravity: 0.1 + Math.random() * 0.1,
-                decay: 0.96 + Math.random() * 0.03
+                decay: 0.96 + Math.random() * 0.03,
+                opacity: 1,
+                wobble: Math.random() * 10,
+                wobbleSpeed: 0.1 + Math.random() * 0.2
             });
         }
         
         // Start the animation if not already active
         if (!this.isActive) {
             this.isActive = true;
-            this.currentAnimation = 'confetti-burst';
+            this.currentAnimation = 'confetti';
             requestAnimationFrame((timestamp) => this.animate(timestamp));
         }
     }

@@ -51,7 +51,7 @@ class ThemesManager {
                     background: "linear-gradient(135deg, #34d399, #10b981)"
                 },
                 font: "'Poppins', sans-serif",
-                animation: "fireworks",
+                animation: "confetti",
                 useConfetti: true
             },
             custom: {
