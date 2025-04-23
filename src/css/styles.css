@@ -1220,6 +1220,8 @@ input[type="color"]:focus {
     cursor: pointer;
     transition: var(--transition);
     box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
 }
 
 .share-btn:hover {
@@ -1229,6 +1231,35 @@ input[type="color"]:focus {
 
 .share-btn svg {
     flex-shrink: 0;
+    z-index: 1;
+}
+
+.share-btn span {
+    z-index: 1;
+}
+
+/* Improve touch area on mobile */
+@media (max-width: 600px) {
+    .share-btn {
+        min-height: 44px; /* Better touch target size */
+    }
+    
+    .share-buttons {
+        gap: var(--space-xs);
+    }
+}
+
+/* Improved button layout for larger screens */
+@media (min-width: 768px) {
+    .share-buttons {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .share-tooltip {
+        margin-top: var(--space-base);
+    }
 }
 
 /* Platform-specific colors */
@@ -1241,31 +1272,84 @@ input[type="color"]:focus {
     background-color: rgba(37, 211, 102, 0.1);
 }
 
-.telegram-btn {
-    color: #0088cc;
-    border-color: rgba(0, 136, 204, 0.3);
+.instagram-btn {
+    border-color: rgba(225, 48, 108, 0.3);
+    position: relative;
 }
 
-.telegram-btn:hover {
-    background-color: rgba(0, 136, 204, 0.1);
+.instagram-btn span {
+    background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 600;
 }
 
-.email-btn {
-    color: #ea4335;
-    border-color: rgba(234, 67, 53, 0.3);
+.instagram-btn svg {
+    fill: url(#instagram-gradient);
 }
 
-.email-btn:hover {
-    background-color: rgba(234, 67, 53, 0.1);
+.instagram-btn:hover {
+    background-color: rgba(225, 48, 108, 0.1);
 }
 
+.snapchat-btn {
+    color: #FFFC00;
+    border-color: rgba(255, 252, 0, 0.3);
+}
+
+.snapchat-btn:hover {
+    background-color: rgba(255, 252, 0, 0.1);
+}
+
+.share-api-btn {
+    color: #4285F4;
+    border-color: rgba(66, 133, 244, 0.3);
+}
+
+.share-api-btn:hover {
+    background-color: rgba(66, 133, 244, 0.1);
+}
+
+.share-tooltip {
+    text-align: center;
+    font-size: var(--fs-sm);
+    color: var(--text-color-light);
+    margin-top: var(--space-sm);
+    font-style: italic;
+}
+
+/* Dark mode adjustments for colorful buttons */
+body.dark-mode .instagram-btn svg,
+body.dark-mode .snapchat-btn svg,
+body.dark-mode .share-api-btn svg,
+body.dark-mode .whatsapp-btn svg {
+    filter: brightness(1.2);
+}
+
+body.dark-mode .instagram-btn {
+    background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+body.dark-mode .snapchat-btn {
+    color: #FFFC00;
+}
+
+body.dark-mode .share-api-btn {
+    color: #4285F4;
+}
+
+body.dark-mode .whatsapp-btn {
+    color: #25D366;
+}
+
+/* Remove old button styles */
+.telegram-btn,
+.email-btn,
 .twitter-btn {
-    color: #1DA1F2;
-    border-color: rgba(29, 161, 242, 0.3);
-}
-
-.twitter-btn:hover {
-    background-color: rgba(29, 161, 242, 0.1);
+    display: none;
 }
 
 /* Toast notification for copy confirmation */
@@ -1284,7 +1368,12 @@ input[type="color"]:focus {
     align-items: center;
     gap: var(--space-sm);
     opacity: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                opacity 0.3s ease;
+    font-weight: 500;
+    max-width: 90%;
+    text-align: center;
+    border-left: 4px solid #ffffff;
 }
 
 .toast.show {
@@ -1295,10 +1384,39 @@ input[type="color"]:focus {
 .toast svg {
     width: 20px;
     height: 20px;
+    flex-shrink: 0;
+}
+
+/* Toast animation */
+@keyframes toastPulse {
+    0% { box-shadow: 0 0 0 0 rgba(107, 70, 193, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(107, 70, 193, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(107, 70, 193, 0); }
+}
+
+.toast.show {
+    animation: toastPulse 2s infinite;
 }
 
 @media (min-width: 768px) {
     .share-buttons {
         grid-template-columns: repeat(4, 1fr);
     }
+}
+
+/* Add SVG gradient definition for Instagram icon */
+.share-buttons-container:before {
+    content: "";
+    display: block;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+/* Hidden SVG for gradient definitions */
+.svg-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
 } 

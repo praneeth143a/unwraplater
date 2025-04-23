@@ -103,32 +103,115 @@ class TimeCapsuleApp {
      * Set up share buttons event handlers
      */
     setupShareButtons() {
-        const shareButtons = {
-            'share-whatsapp': (url) => `https://wa.me/?text=${encodeURIComponent(url)}`,
-            'share-telegram': (url) => `https://t.me/share/url?url=${encodeURIComponent(url)}`,
-            'share-email': (url) => `mailto:?subject=Time Capsule&body=${encodeURIComponent(url)}`,
-            'share-twitter': (url) => `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent('Check out my Time Capsule!')}`
-        };
+        // WhatsApp direct link
+        const whatsappBtn = document.getElementById('share-whatsapp');
+        if (whatsappBtn) {
+            whatsappBtn.addEventListener('click', () => {
+                if (!this.currentCapsule) {
+                    this.showToast('No capsule available to share.');
+                    return;
+                }
+                
+                // Always use long URL for sharing
+                const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
+                
+                // Open WhatsApp web with pre-filled message
+                const shareUrl = `https://wa.me/?text=${encodeURIComponent(capsuleLink)}`;
+                window.open(shareUrl, '_blank');
+            });
+        }
         
-        // Add event listeners to each share button
-        Object.keys(shareButtons).forEach(buttonId => {
-            const button = document.getElementById(buttonId);
-            if (button) {
-                button.addEventListener('click', () => {
-                    if (!this.currentCapsule) {
-                        alert('No capsule available to share.');
-                        return;
-                    }
-                    
-                    // Always use long URL for sharing
-                    const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
-                    
-                    // Generate platform-specific URL and open in new window
-                    const shareUrl = shareButtons[buttonId](capsuleLink);
-                    window.open(shareUrl, '_blank');
-                });
-            }
-        });
+        // Instagram - Just copy to clipboard
+        const instagramBtn = document.getElementById('share-instagram');
+        if (instagramBtn) {
+            instagramBtn.addEventListener('click', () => {
+                if (!this.currentCapsule) {
+                    this.showToast('No capsule available to share.');
+                    return;
+                }
+                
+                // Copy to clipboard and show notification
+                const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
+                navigator.clipboard.writeText(capsuleLink)
+                    .then(() => {
+                        this.showToast('Link copied! Open Instagram to share');
+                    })
+                    .catch(err => {
+                        this.fallbackCopyToClipboard(capsuleLink);
+                        this.showToast('Link copied! Open Instagram to share');
+                    });
+            });
+        }
+        
+        // Snapchat - Just copy to clipboard
+        const snapchatBtn = document.getElementById('share-snapchat');
+        if (snapchatBtn) {
+            snapchatBtn.addEventListener('click', () => {
+                if (!this.currentCapsule) {
+                    this.showToast('No capsule available to share.');
+                    return;
+                }
+                
+                // Copy to clipboard and show notification
+                const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
+                navigator.clipboard.writeText(capsuleLink)
+                    .then(() => {
+                        this.showToast('Link copied! Open Snapchat to share');
+                    })
+                    .catch(err => {
+                        this.fallbackCopyToClipboard(capsuleLink);
+                        this.showToast('Link copied! Open Snapchat to share');
+                    });
+            });
+        }
+        
+        // Web Share API
+        const shareApiBtn = document.getElementById('share-api');
+        if (shareApiBtn) {
+            shareApiBtn.addEventListener('click', () => {
+                if (!this.currentCapsule) {
+                    this.showToast('No capsule available to share.');
+                    return;
+                }
+                
+                const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
+                
+                // Check if Web Share API is supported
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'UnwrapLater Time Capsule',
+                        text: 'Check out my time capsule message!',
+                        url: capsuleLink
+                    })
+                    .then(() => {
+                        this.showToast('Shared successfully!');
+                    })
+                    .catch(err => {
+                        // If user cancelled or share failed, fall back to clipboard
+                        if (err.name !== 'AbortError') {
+                            navigator.clipboard.writeText(capsuleLink)
+                                .then(() => {
+                                    this.showToast('Link copied to clipboard instead');
+                                })
+                                .catch(err => {
+                                    this.fallbackCopyToClipboard(capsuleLink);
+                                    this.showToast('Link copied to clipboard instead');
+                                });
+                        }
+                    });
+                } else {
+                    // Fallback for browsers that don't support Web Share API
+                    navigator.clipboard.writeText(capsuleLink)
+                        .then(() => {
+                            this.showToast('Link copied to clipboard');
+                        })
+                        .catch(err => {
+                            this.fallbackCopyToClipboard(capsuleLink);
+                            this.showToast('Link copied to clipboard');
+                        });
+                }
+            });
+        }
     }
     
     /**
