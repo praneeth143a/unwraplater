@@ -228,7 +228,9 @@ class TimeCapsuleApp {
         // Start animations for specific views
         if (view === this.unlockView && !this.isLocked) {
             const currentTheme = themesManager.getCurrentTheme();
-            animationManager.startAnimation(currentTheme.animation);
+            // Use confetti animation if the theme specifies fireworks
+            const animation = currentTheme.animation === 'fireworks' ? 'confetti' : currentTheme.animation;
+            animationManager.startAnimation(animation);
             
             // If theme uses confetti, trigger a burst
             if (currentTheme.useConfetti) {
@@ -657,7 +659,9 @@ class TimeCapsuleApp {
                 
                 // Start animation
                 const currentTheme = themesManager.getCurrentTheme();
-                animationManager.startAnimation(currentTheme.animation);
+                // Use confetti animation if the theme specifies fireworks
+                const animation = currentTheme.animation === 'fireworks' ? 'confetti' : currentTheme.animation;
+                animationManager.startAnimation(animation);
                 
                 return;
             }
@@ -729,7 +733,9 @@ class TimeCapsuleApp {
         // Start animation if not already started
         if (!animationManager.isActive) {
             const currentTheme = themesManager.getCurrentTheme();
-            animationManager.startAnimation(currentTheme.animation);
+            // Use confetti animation if the theme specifies fireworks
+            const animation = currentTheme.animation === 'fireworks' ? 'confetti' : currentTheme.animation;
+            animationManager.startAnimation(animation);
             
             // If theme uses confetti, trigger a burst
             if (currentTheme.useConfetti) {
