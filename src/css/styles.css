@@ -1180,4 +1180,125 @@ input[type="color"]:focus {
 
 .color-picker-container label {
     margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Share Buttons
+   ========================================================================== */
+
+.share-buttons-container {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-base);
+    border-top: 1px solid var(--border-color);
+}
+
+.share-title {
+    font-size: var(--fs-base);
+    font-weight: 500;
+    margin-bottom: var(--space-sm);
+    color: var(--text-color);
+}
+
+.share-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+}
+
+.share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-base);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-color);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.share-btn svg {
+    flex-shrink: 0;
+}
+
+/* Platform-specific colors */
+.whatsapp-btn {
+    color: #25D366;
+    border-color: rgba(37, 211, 102, 0.3);
+}
+
+.whatsapp-btn:hover {
+    background-color: rgba(37, 211, 102, 0.1);
+}
+
+.telegram-btn {
+    color: #0088cc;
+    border-color: rgba(0, 136, 204, 0.3);
+}
+
+.telegram-btn:hover {
+    background-color: rgba(0, 136, 204, 0.1);
+}
+
+.email-btn {
+    color: #ea4335;
+    border-color: rgba(234, 67, 53, 0.3);
+}
+
+.email-btn:hover {
+    background-color: rgba(234, 67, 53, 0.1);
+}
+
+.twitter-btn {
+    color: #1DA1F2;
+    border-color: rgba(29, 161, 242, 0.3);
+}
+
+.twitter-btn:hover {
+    background-color: rgba(29, 161, 242, 0.1);
+}
+
+/* Toast notification for copy confirmation */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background-color: var(--primary-color);
+    color: white;
+    padding: var(--space-base) var(--space-lg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast svg {
+    width: 20px;
+    height: 20px;
+}
+
+@media (min-width: 768px) {
+    .share-buttons {
+        grid-template-columns: repeat(4, 1fr);
+    }
 } 

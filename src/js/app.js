@@ -72,6 +72,9 @@ class TimeCapsuleApp {
             }
         });
         
+        // Share buttons
+        this.setupShareButtons();
+        
         // Download capsule button
         document.getElementById('download-capsule').addEventListener('click', () => this.downloadCapsule());
         
@@ -94,6 +97,59 @@ class TimeCapsuleApp {
             openNowBtn.addEventListener('click', () => this.openCapsuleNow());
         }
         */
+    }
+    
+    /**
+     * Set up share buttons event handlers
+     */
+    setupShareButtons() {
+        const shareButtons = {
+            'share-whatsapp': (url) => `https://wa.me/?text=${encodeURIComponent(url)}`,
+            'share-telegram': (url) => `https://t.me/share/url?url=${encodeURIComponent(url)}`,
+            'share-email': (url) => `mailto:?subject=Time Capsule&body=${encodeURIComponent(url)}`,
+            'share-twitter': (url) => `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent('Check out my Time Capsule!')}`
+        };
+        
+        // Add event listeners to each share button
+        Object.keys(shareButtons).forEach(buttonId => {
+            const button = document.getElementById(buttonId);
+            if (button) {
+                button.addEventListener('click', () => {
+                    if (!this.currentCapsule) {
+                        alert('No capsule available to share.');
+                        return;
+                    }
+                    
+                    // Always use long URL for sharing
+                    const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
+                    
+                    // Generate platform-specific URL and open in new window
+                    const shareUrl = shareButtons[buttonId](capsuleLink);
+                    window.open(shareUrl, '_blank');
+                });
+            }
+        });
+    }
+    
+    /**
+     * Show a toast notification
+     * @param {string} message - Message to display in the toast
+     */
+    showToast(message) {
+        const toast = document.getElementById('toast-notification');
+        const messageElement = document.getElementById('toast-message');
+        
+        if (toast && messageElement) {
+            messageElement.textContent = message;
+            
+            // Show toast
+            toast.classList.add('show');
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
     }
     
     setDefaultUnlockTime() {
@@ -340,13 +396,8 @@ class TimeCapsuleApp {
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(capsuleLink)
                 .then(() => {
-                    // Show success feedback
-                    const copyBtn = document.getElementById('copy-link');
-                    const originalText = copyBtn.textContent;
-                    copyBtn.textContent = 'Copied!';
-                    setTimeout(() => {
-                        copyBtn.textContent = originalText;
-                    }, 2000);
+                    // Show toast notification for success
+                    this.showToast('Link copied to clipboard ✅');
                 })
                 .catch(err => {
                     console.error('Failed to copy link:', err);
@@ -366,13 +417,8 @@ class TimeCapsuleApp {
         try {
             const successful = document.execCommand('copy');
             if (successful) {
-                // Visual feedback
-                const copyBtn = document.getElementById('copy-link');
-                const originalText = copyBtn.textContent;
-                copyBtn.textContent = 'Copied!';
-                setTimeout(() => {
-                    copyBtn.textContent = originalText;
-                }, 2000);
+                // Show toast notification for success
+                this.showToast('Link copied to clipboard ✅');
             } else {
                 alert('Please copy the link manually');
             }
