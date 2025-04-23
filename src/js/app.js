@@ -87,11 +87,13 @@ class TimeCapsuleApp {
         // Create new from unlock view button
         document.getElementById('create-new-from-unlock').addEventListener('click', () => this.showCreateView());
         
-        // Open Now button - to bypass timer
+        // Open Now button - No longer used
+        /*
         const openNowBtn = document.getElementById('open-now-btn');
         if (openNowBtn) {
             openNowBtn.addEventListener('click', () => this.openCapsuleNow());
         }
+        */
     }
     
     setDefaultUnlockTime() {
@@ -462,16 +464,8 @@ class TimeCapsuleApp {
             unlockDate.setSeconds(0, 0);
             currentDate.setSeconds(0, 0);
             
-            // Check if current time matches unlock time or is after unlock time
-            if (unlockDate > currentDate) {
-                // Not yet time to unlock
-                this.setupCountdown(unlockTime);
-                this.timerContainer.classList.remove('hidden');
-                this.isLocked = true;
-                
-                // Add Open Now button to bypass timer
-                this.addOpenNowButton();
-            } else {
+            // If unlock time is exactly now or in the past, show content
+            if (unlockDate.getTime() <= currentDate.getTime()) {
                 // Time to unlock, but check if passphrase required
                 this.isLocked = false;
                 
@@ -482,6 +476,13 @@ class TimeCapsuleApp {
                     // No passphrase, reveal message
                     this.revealMessage(capsuleData.message);
                 }
+            } else {
+                // Future time - just show the countdown timer
+                this.setupCountdown(unlockTime);
+                this.timerContainer.classList.remove('hidden');
+                this.isLocked = true;
+                
+                // Do not add "Open Now" button anymore
             }
             
             // Show unlock view
@@ -493,44 +494,10 @@ class TimeCapsuleApp {
     }
     
     /**
-     * Add a button to open the capsule immediately, bypassing the timer
-     */
-    addOpenNowButton() {
-        // Check if the Open Now button container already exists
-        let openNowContainer = document.getElementById('open-now-container');
-        
-        if (!openNowContainer) {
-            // Create the container and button if they don't exist
-            openNowContainer = document.createElement('div');
-            openNowContainer.id = 'open-now-container';
-            openNowContainer.className = 'open-now-container';
-            
-            // Add a note about early opening
-            const noteEl = document.createElement('p');
-            noteEl.className = 'note';
-            noteEl.textContent = 'Don\'t want to wait? You can open the capsule now:';
-            openNowContainer.appendChild(noteEl);
-            
-            // Create the button
-            const openNowBtn = document.createElement('button');
-            openNowBtn.id = 'open-now-btn';
-            openNowBtn.className = 'btn secondary';
-            openNowBtn.textContent = 'Open Now';
-            openNowBtn.addEventListener('click', () => this.openCapsuleNow());
-            
-            openNowContainer.appendChild(openNowBtn);
-            
-            // Insert the container after the timer container
-            this.timerContainer.insertAdjacentElement('afterend', openNowContainer);
-        } else {
-            // If it exists, just make sure it's visible
-            openNowContainer.classList.remove('hidden');
-        }
-    }
-    
-    /**
      * Open the capsule immediately, bypassing the timer
+     * Note: This functionality has been disabled as per requirements
      */
+    /*
     openCapsuleNow() {
         if (!this.currentCapsule) {
             alert('No capsule available to open.');
@@ -572,6 +539,7 @@ class TimeCapsuleApp {
             animationManager.burstConfetti(centerX, centerY, 100);
         }
     }
+    */
     
     setupCountdown(unlockTime) {
         // Clear any existing countdown
@@ -596,12 +564,6 @@ class TimeCapsuleApp {
                 // Time's up, clear countdown and show message
                 clearInterval(this.countdown);
                 this.timerContainer.classList.add('hidden');
-                
-                // Remove the open now container from the DOM
-                const openNowContainer = document.getElementById('open-now-container');
-                if (openNowContainer) {
-                    openNowContainer.parentNode.removeChild(openNowContainer);
-                }
                 
                 // Check if passphrase required
                 const capsuleData = this.currentCapsule.data;
