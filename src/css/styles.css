@@ -1190,19 +1190,35 @@ input[type="color"]:focus {
     margin-top: var(--space-lg);
     padding-top: var(--space-base);
     border-top: 1px solid var(--border-color);
+    text-align: center;
 }
 
 .share-title {
-    font-size: var(--fs-base);
-    font-weight: 500;
-    margin-bottom: var(--space-sm);
-    color: var(--text-color);
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    margin-bottom: var(--space-base);
+    color: var(--primary-color);
+    position: relative;
+    display: inline-block;
+}
+
+.share-title:after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
 }
 
 .share-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-sm);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-base);
+    margin: var(--space-lg) auto;
+    max-width: 500px;
 }
 
 .share-btn {
@@ -1210,18 +1226,21 @@ input[type="color"]:focus {
     align-items: center;
     justify-content: center;
     gap: var(--space-xs);
-    padding: var(--space-sm) var(--space-base);
+    padding: var(--space-sm) var(--space-lg);
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     color: var(--text-color);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-base);
     font-weight: 500;
     cursor: pointer;
     transition: var(--transition);
     box-shadow: var(--shadow-sm);
     position: relative;
     overflow: hidden;
+    flex: 1;
+    min-width: 140px;
+    max-width: 180px;
 }
 
 .share-btn:hover {
@@ -1238,77 +1257,34 @@ input[type="color"]:focus {
     z-index: 1;
 }
 
-/* Improve touch area on mobile */
-@media (max-width: 600px) {
-    .share-btn {
-        min-height: 44px; /* Better touch target size */
-    }
-    
-    .share-buttons {
-        gap: var(--space-xs);
-    }
+.share-api-btn {
+    color: #4285F4;
+    border-color: rgba(66, 133, 244, 0.5);
+    background-color: rgba(66, 133, 244, 0.05);
+    font-weight: 600;
 }
 
-/* Improved button layout for larger screens */
-@media (min-width: 768px) {
-    .share-buttons {
-        grid-template-columns: repeat(4, 1fr);
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    
-    .share-tooltip {
-        margin-top: var(--space-base);
-    }
+.share-api-btn:hover {
+    background-color: rgba(66, 133, 244, 0.1);
 }
 
-/* Platform-specific colors */
 .whatsapp-btn {
     color: #25D366;
-    border-color: rgba(37, 211, 102, 0.3);
+    border-color: rgba(37, 211, 102, 0.5);
+    background-color: rgba(37, 211, 102, 0.05);
 }
 
 .whatsapp-btn:hover {
     background-color: rgba(37, 211, 102, 0.1);
 }
 
-.instagram-btn {
-    border-color: rgba(225, 48, 108, 0.3);
-    position: relative;
+.copy-btn {
+    color: var(--text-color);
+    border-color: rgba(100, 100, 100, 0.3);
 }
 
-.instagram-btn span {
-    background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    font-weight: 600;
-}
-
-.instagram-btn svg {
-    fill: url(#instagram-gradient);
-}
-
-.instagram-btn:hover {
-    background-color: rgba(225, 48, 108, 0.1);
-}
-
-.snapchat-btn {
-    color: #FFFC00;
-    border-color: rgba(255, 252, 0, 0.3);
-}
-
-.snapchat-btn:hover {
-    background-color: rgba(255, 252, 0, 0.1);
-}
-
-.share-api-btn {
-    color: #4285F4;
-    border-color: rgba(66, 133, 244, 0.3);
-}
-
-.share-api-btn:hover {
-    background-color: rgba(66, 133, 244, 0.1);
+.copy-btn:hover {
+    background-color: rgba(100, 100, 100, 0.05);
 }
 
 .share-tooltip {
@@ -1317,26 +1293,24 @@ input[type="color"]:focus {
     color: var(--text-color-light);
     margin-top: var(--space-sm);
     font-style: italic;
+    opacity: 0.8;
 }
 
-/* Dark mode adjustments for colorful buttons */
-body.dark-mode .instagram-btn svg,
-body.dark-mode .snapchat-btn svg,
-body.dark-mode .share-api-btn svg,
-body.dark-mode .whatsapp-btn svg {
-    filter: brightness(1.2);
+/* Improve touch area on mobile */
+@media (max-width: 600px) {
+    .share-btn {
+        min-height: 48px; /* Better touch target size */
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .share-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
 }
 
-body.dark-mode .instagram-btn {
-    background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
-    -webkit-background-clip: text;
-    background-clip: text;
-}
-
-body.dark-mode .snapchat-btn {
-    color: #FFFC00;
-}
-
+/* Dark mode adjustments for buttons */
 body.dark-mode .share-api-btn {
     color: #4285F4;
 }
@@ -1345,7 +1319,9 @@ body.dark-mode .whatsapp-btn {
     color: #25D366;
 }
 
-/* Remove old button styles */
+/* Hide unused button styles */
+.instagram-btn,
+.snapchat-btn,
 .telegram-btn,
 .email-btn,
 .twitter-btn {

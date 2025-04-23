@@ -121,50 +121,6 @@ class TimeCapsuleApp {
             });
         }
         
-        // Instagram - Just copy to clipboard
-        const instagramBtn = document.getElementById('share-instagram');
-        if (instagramBtn) {
-            instagramBtn.addEventListener('click', () => {
-                if (!this.currentCapsule) {
-                    this.showToast('No capsule available to share.');
-                    return;
-                }
-                
-                // Copy to clipboard and show notification
-                const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
-                navigator.clipboard.writeText(capsuleLink)
-                    .then(() => {
-                        this.showToast('Link copied! Open Instagram to share');
-                    })
-                    .catch(err => {
-                        this.fallbackCopyToClipboard(capsuleLink);
-                        this.showToast('Link copied! Open Instagram to share');
-                    });
-            });
-        }
-        
-        // Snapchat - Just copy to clipboard
-        const snapchatBtn = document.getElementById('share-snapchat');
-        if (snapchatBtn) {
-            snapchatBtn.addEventListener('click', () => {
-                if (!this.currentCapsule) {
-                    this.showToast('No capsule available to share.');
-                    return;
-                }
-                
-                // Copy to clipboard and show notification
-                const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
-                navigator.clipboard.writeText(capsuleLink)
-                    .then(() => {
-                        this.showToast('Link copied! Open Snapchat to share');
-                    })
-                    .catch(err => {
-                        this.fallbackCopyToClipboard(capsuleLink);
-                        this.showToast('Link copied! Open Snapchat to share');
-                    });
-            });
-        }
-        
         // Web Share API
         const shareApiBtn = document.getElementById('share-api');
         if (shareApiBtn) {
@@ -189,28 +145,49 @@ class TimeCapsuleApp {
                     .catch(err => {
                         // If user cancelled or share failed, fall back to clipboard
                         if (err.name !== 'AbortError') {
-                            navigator.clipboard.writeText(capsuleLink)
-                                .then(() => {
-                                    this.showToast('Link copied to clipboard instead');
-                                })
-                                .catch(err => {
-                                    this.fallbackCopyToClipboard(capsuleLink);
-                                    this.showToast('Link copied to clipboard instead');
-                                });
+                            this.copyToClipboard(capsuleLink, 'Link copied! Try sharing again');
                         }
                     });
                 } else {
                     // Fallback for browsers that don't support Web Share API
-                    navigator.clipboard.writeText(capsuleLink)
-                        .then(() => {
-                            this.showToast('Link copied to clipboard');
-                        })
-                        .catch(err => {
-                            this.fallbackCopyToClipboard(capsuleLink);
-                            this.showToast('Link copied to clipboard');
-                        });
+                    this.copyToClipboard(capsuleLink, 'Link copied to clipboard');
                 }
             });
+        }
+        
+        // Direct copy button
+        const copyDirectBtn = document.getElementById('copy-direct');
+        if (copyDirectBtn) {
+            copyDirectBtn.addEventListener('click', () => {
+                if (!this.currentCapsule) {
+                    this.showToast('No capsule available to share.');
+                    return;
+                }
+                
+                const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
+                this.copyToClipboard(capsuleLink, 'Link copied to clipboard!');
+            });
+        }
+    }
+    
+    /**
+     * Helper method to copy text to clipboard
+     * @param {string} text - Text to copy
+     * @param {string} successMessage - Message to show on success
+     */
+    copyToClipboard(text, successMessage = 'Copied to clipboard') {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    this.showToast(successMessage);
+                })
+                .catch(err => {
+                    this.fallbackCopyToClipboard(text);
+                    this.showToast(successMessage);
+                });
+        } else {
+            this.fallbackCopyToClipboard(text);
+            this.showToast(successMessage);
         }
     }
     
@@ -475,40 +452,28 @@ class TimeCapsuleApp {
         const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, useLongUrl);
         this.capsuleLinkInput.value = capsuleLink;
         
-        // Modern clipboard API when available
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(capsuleLink)
-                .then(() => {
-                    // Show toast notification for success
-                    this.showToast('Link copied to clipboard ✅');
-                })
-                .catch(err => {
-                    console.error('Failed to copy link:', err);
-                    // Fallback to older method
-                    this.fallbackCopyToClipboard();
-                });
-        } else {
-            // Fallback for older browsers
-            this.fallbackCopyToClipboard();
-        }
+        // Use the helper method
+        this.copyToClipboard(capsuleLink, 'Link copied to clipboard ✅');
     }
     
-    fallbackCopyToClipboard() {
-        this.capsuleLinkInput.select();
-        this.capsuleLinkInput.setSelectionRange(0, 99999); // For mobile devices
+    fallbackCopyToClipboard(text) {
+        // Create a temporary input element
+        const tempInput = document.createElement('textarea');
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        
+        // Select and copy
+        tempInput.select();
+        tempInput.setSelectionRange(0, 99999); // For mobile devices
         
         try {
-            const successful = document.execCommand('copy');
-            if (successful) {
-                // Show toast notification for success
-                this.showToast('Link copied to clipboard ✅');
-            } else {
-                alert('Please copy the link manually');
-            }
+            document.execCommand('copy');
         } catch (err) {
-            console.error('Failed to copy using execCommand:', err);
-            alert('Please copy the link manually');
+            console.error('Fallback copy failed:', err);
         }
+        
+        // Remove the temporary element
+        document.body.removeChild(tempInput);
     }
     
     downloadCapsule() {
