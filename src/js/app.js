@@ -154,20 +154,6 @@ class TimeCapsuleApp {
                 }
             });
         }
-        
-        // Direct copy button
-        const copyDirectBtn = document.getElementById('copy-direct');
-        if (copyDirectBtn) {
-            copyDirectBtn.addEventListener('click', () => {
-                if (!this.currentCapsule) {
-                    this.showToast('No capsule available to share.');
-                    return;
-                }
-                
-                const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
-                this.copyToClipboard(capsuleLink, 'Link copied to clipboard!');
-            });
-        }
     }
     
     /**
