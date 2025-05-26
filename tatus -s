@@ -1,0 +1,268 @@
+warning: in the working copy of 'index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'js/app.js', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/index.html b/index.html[m
+[1mindex 444ccb9..eba3312 100644[m
+[1m--- a/index.html[m
+[1m+++ b/index.html[m
+[36m@@ -73,6 +73,7 @@[m
+                             </label>[m
+                             <div id="media-preview" class="hidden"></div>[m
+                             <button type="button" id="remove-media" class="hidden">Remove Media</button>[m
+[32m+[m[32m                            <p class="file-size-note">Note: Maximum file size is 50MB. Larger files will be optimized.</p>[m
+                         </div>[m
+                     </div>[m
+                     [m
+[36m@@ -160,7 +161,10 @@[m
+                     [m
+                     <div id="passphrase-container" class="hidden">[m
+                         <input type="password" id="enter-passphrase" placeholder="Enter passphrase">[m
+[31m-                        <button type="button" id="submit-passphrase" class="primary-btn">Unlock</button>[m
+[32m+[m[32m                        <div class="button-group">[m
+[32m+[m[32m                            <button type="button" id="submit-passphrase" class="primary-btn">Unlock</button>[m
+[32m+[m[32m                            <button type="button" id="unwrap-now" class="secondary-btn">Unwrap Now</button>[m
+[32m+[m[32m                        </div>[m
+                         <p id="passphrase-error" class="error hidden">Incorrect passphrase. Please try again.</p>[m
+                     </div>[m
+                     [m
+[1mdiff --git a/js/app.js b/js/app.js[m
+[1mindex 433614c..7fc7f55 100644[m
+[1m--- a/js/app.js[m
+[1m+++ b/js/app.js[m
+[36m@@ -155,10 +155,10 @@[m [mdocument.addEventListener('DOMContentLoaded', () => {[m
+         const file = e.target.files[0];[m
+         [m
+         if (file) {[m
+[31m-            // Check file size (limit to 10MB per file)[m
+[31m-            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes[m
+[32m+[m[32m            // Check file size (limit to 50MB per file)[m
+[32m+[m[32m            const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes[m
+             if (file.size > MAX_FILE_SIZE) {[m
+[31m-                alert('File is too large. Maximum size is 10MB.');[m
+[32m+[m[32m                alert('File is too large. Maximum size is 50MB.');[m
+                 return;[m
+             }[m
+             [m
+[36m@@ -1437,6 +1437,112 @@[m [mdocument.addEventListener('DOMContentLoaded', () => {[m
+ [m
+         return "#" + RR + GG + BB;[m
+     }[m
+[32m+[m
+[32m+[m[32m    // Verify password function[m
+[32m+[m[32m    async function verifyPassword(inputPassword, storedPassword) {[m
+[32m+[m[32m        try {[m
+[32m+[m[32m            // Extract salt and hash from stored password[m
+[32m+[m[32m            const parts = storedPassword.split(':');[m
+[32m+[m[32m            const salt = parts[0];[m
+[32m+[m[32m            const storedHash = parts[1];[m
+[32m+[m[41m            [m
+[32m+[m[32m            // Convert salt to ArrayBuffer[m
+[32m+[m[32m            const encoder = new TextEncoder();[m
+[32m+[m[32m            const saltBuffer = encoder.encode(salt);[m
+[32m+[m[41m            [m
+[32m+[m[32m            // Derive key using same parameters as encryption[m
+[32m+[m[32m            const keyMaterial = await window.crypto.subtle.importKey([m
+[32m+[m[32m                "raw",[m
+[32m+[m[32m                encoder.encode(inputPassword),[m
+[32m+[m[32m                { name: "PBKDF2" },[m
+[32m+[m[32m                false,[m
+[32m+[m[32m                ["deriveBits", "deriveKey"][m
+[32m+[m[32m            );[m
+[32m+[m[41m            [m
+[32m+[m[32m            const key = await window.crypto.subtle.deriveKey([m
+[32m+[m[32m                {[m
+[32m+[m[32m                    name: "PBKDF2",[m
+[32m+[m[32m                    salt: saltBuffer,[m
+[32m+[m[32m                    iterations: 100000,[m
+[32m+[m[32m                    hash: "SHA-256"[m
+[32m+[m[32m                },[m
+[32m+[m[32m                keyMaterial,[m
+[32m+[m[32m                { name: "HMAC", hash: "SHA-256", length: 256 },[m
+[32m+[m[32m                true,[m
+[32m+[m[32m                ["sign", "verify"][m
+[32m+[m[32m            );[m
+[32m+[m[41m            [m
+[32m+[m[32m            // Export the derived key[m
+[32m+[m[32m            const keyBuffer = await window.crypto.subtle.exportKey("raw", key);[m
+[32m+[m[41m            [m
+[32m+[m[32m            // Convert to hex for comparison[m
+[32m+[m[32m            const keyArray = Array.from(new Uint8Array(keyBuffer));[m
+[32m+[m[32m            const derivedHash = keyArray.map(b => b.toString(16).padStart(2, '0')).join('');[m
+[32m+[m[41m            [m
+[32m+[m[32m            // Compare the hashes[m
+[32m+[m[32m            return derivedHash === storedHash;[m
+[32m+[m[32m        } catch (error) {[m
+[32m+[m[32m            console.error("Error verifying password:", error);[m
+[32m+[m[32m            return false;[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    // Unwrap time capsule immediately function[m
+[32m+[m[32m    function unwrapLater() {[m
+[32m+[m[32m        const capsuleContentElement = document.getElementById('capsule-content');[m
+[32m+[m[32m        const unlockSection = document.getElementById('unlock-section');[m
+[32m+[m[32m        const viewSection = document.getElementById('view-section');[m
+[32m+[m[41m        [m
+[32m+[m[32m        if (capsuleContentElement && unlockSection && viewSection) {[m
+[32m+[m[32m            // Hide the unlock section[m
+[32m+[m[32m            unlockSection.classList.add('hidden');[m
+[32m+[m[41m            [m
+[32m+[m[32m            // Show the view section[m
+[32m+[m[32m            viewSection.classList.remove('hidden');[m
+[32m+[m[41m            [m
+[32m+[m[32m            // Retrieve and display the time capsule content[m
+[32m+[m[32m            try {[m
+[32m+[m[32m                const savedCapsule = localStorage.getItem('timeCapsule');[m
+[32m+[m[32m                if (savedCapsule) {[m
+[32m+[m[32m                    const capsuleData = JSON.parse(savedCapsule);[m
+[32m+[m[41m                    [m
+[32m+[m[32m                    // Display theme[m
+[32m+[m[32m                    const themeIcon = document.getElementById('display-theme-icon');[m
+[32m+[m[32m                    const themeName = document.getElementById('display-theme-name');[m
+[32m+[m[32m                    if (themeIcon && themeName && capsuleData.theme) {[m
+[32m+[m[32m                        themeIcon.textContent = capsuleData.theme.icon;[m
+[32m+[m[32m                        themeName.textContent = capsuleData.theme.name;[m
+[32m+[m[32m                    }[m
+[32m+[m[41m                    [m
+[32m+[m[32m                    // Display message[m
+[32m+[m[32m                    const messageElement = document.getElementById('display-message');[m
+[32m+[m[32m                    if (messageElement && capsuleData.message) {[m
+[32m+[m[32m                        messageElement.textContent = capsuleData.message;[m
+[32m+[m[32m                    }[m
+[32m+[m[41m                    [m
+[32m+[m[32m                    // Display media if present[m
+[32m+[m[32m                    const mediaContainer = document.getElementById('display-media');[m
+[32m+[m[32m                    if (mediaContainer && capsuleData.media) {[m
+[32m+[m[32m                        if (capsuleData.mediaType.startsWith('image/')) {[m
+[32m+[m[32m                            const img = document.createElement('img');[m
+[32m+[m[32m                            img.src = capsuleData.media;[m
+[32m+[m[32m                            img.classList.add('display-media-content');[m
+[32m+[m[32m                            mediaContainer.appen[1mdiff --git a/js/app.js b/js/app.js[m
+[1mindex 9a76a31..1418252 100644[m
+[1m--- a/js/app.js[m
+[1m+++ b/js/app.js[m
+[36m@@ -422,25 +422,25 @@[m [mdocument.addEventListener('DOMContentLoaded', () => {[m
+         // Generate share link with capsule data embedded in URL[m
+         const baseUrl = window.location.origin + window.location.pathname;[m
+         [m
+[31m-        // Create a sharable data object containing essential capsule data[m
+[32m+[m[32m        // Create a more compact sharable data object with minimal essential data[m
+         const shareableData = {[m
+             id: capsule.id,[m
+[31m-            message: capsule.message,[m
+[31m-            theme: capsule.theme,[m
+[31m-            customAnimation: capsule.customAnimation,[m
+[31m-            customColor: capsule.customColor,[m
+[31m-            unlockDate: capsule.unlockDate,[m
+[31m-            hasPassphrase: capsule.hasPassphrase,[m
+[31m-            passphrase: capsule.passphrase[m
+[32m+[m[32m            // Include only a short preview of the message for the URL[m
+[32m+[m[32m            m: capsule.message.length > 50 ? capsule.message.substring(0, 50) + '...' : capsule.message,[m
+[32m+[m[32m            t: capsule.theme,[m
+[32m+[m[32m            d: capsule.unlockDate,[m
+[32m+[m[32m            h: capsule.hasPassphrase ? 1 : 0[m
+         };[m
+         [m
+[31m-        // Add media data if it's available (but be careful about size)[m
+[32m+[m[32m        // Add minimal media info if available[m
+         if (currentMediaFile) {[m
+[31m-            // For immediate sharing, include a flag that media exists[m
+[31m-            shareableData.hasMedia = true;[m
+[32m+[m[32m            shareableData.hm = 1; // has media flag[m
+         }[m
+         [m
+[31m-        // Encode the data to base64[m
+[32m+[m[32m        // Store the full capsule in local storage for later retrieval[m
+[32m+[m[32m        StorageUtil.saveCapsule(capsule);[m
+[32m+[m[41m        [m
+[32m+[m[32m        // Encode the minimal data to base64[m
+         const encodedData = btoa(encodeURIComponent(JSON.stringify(shareableData)));[m
+         [m
+         // Create the sharing URL with encoded data[m
+[36m@@ -1191,7 +1191,10 @@[m [mdocument.addEventListener('DOMContentLoaded', () => {[m
+             try {[m
+                 // Decode the base64 data[m
+                 const decodedData = decodeURIComponent(atob(encodedData));[m
+[31m-                const capsuleData = JSON.parse(decodedData);[m
+[32m+[m[32m                const compactData = JSON.parse(decodedData);[m
+[32m+[m[41m                [m
+[32m+[m[32m                // Convert compact data format to full capsule data format if needed[m
+[32m+[m[32m                const capsuleData = expandCompactData(compactData);[m
+                 [m
+                 // Open the capsule from the URL data[m
+                 openCapsuleFromURLData(capsuleData);[m
+[36m@@ -1209,6 +1212,36 @@[m [mdocument.addEventListener('DOMContentLoaded', () => {[m
+         }[m
+     }[m
+     [m
+[32m+[m[32m    /**[m
+[32m+[m[32m     * Expand compact data format to full capsule data[m
+[32m+[m[32m     * @param {Object} compactData - Compact data from URL[m
+[32m+[m[32m     * @returns {Object} - Full capsule data[m
+[32m+[m[32m     */[m
+[32m+[m[32m    function expandCompactData(compactData) {[m
+[32m+[m[32m        // Check if it's already in full format (backward compatibility)[m
+[32m+[m[32m        if (compactData.message && compactData.theme) {[m
+[32m+[m[32m            return compactData;[m
+[32m+[m[32m        }[m
+[32m+[m[41m        [m
+[32m+[m[32m        // Try to get full data from storage first if we have an ID[m
+[32m+[m[32m        if (compactData.id) {[m
+[32m+[m[32m            const storedCapsule = StorageUtil.getCapsule(compactData.id);[m
+[32m+[m[32m            if (storedCapsule) {[m
+[32m+[m[32m                return storedCapsule;[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+[32m+[m[41m        [m
+[32m+[m[32m        // Otherwise, convert from compact format to full format[m
+[32m+[m[32m        return {[m
+[32m+[m[32m            id: compactData.id,[m
+[32m+[m[32m            message: compactData.m,[m
+[32m+[m[32m            theme: compactData.t,[m
+[32m+[m[32m            unlockDate: compactData.d,[m
+[32m+[m[32m            hasPassphrase: compactData.h === 1,[m
+[32m+[m[32m            hasMedia: compactData.hm === 1[m
+[32m+[m[32m        };[m
+[32m+[m[32m    }[m
+[32m+[m[41m    [m
+     // Open capsule using data directly from the URL[m
+     function openCapsuleFromURLData(capsuleData) {[m
+         // Ensure the capsule data is saved for future access[m
+[36m@@ -1263,8 +1296,17 @@[m [mdocument.addEventListener('DOMContentLoaded', () => {[m
+                 document.getElementById('submit-passphrase').addEventListener('click', () => {[m
+                     const enteredPassphrase = document.getElementById('enter-passphrase').value;[m
+                     [m
+[32m+[m[32m                    // Check if we need to get the passphrase from storage[m
+[32m+[m[32m                    let passphraseToCheck = capsuleData.passphrase;[m
+[32m+[m[32m                    if (!passphraseToCheck && capsuleData.id) {[m
+[32m+[m[32m                        const storedCapsule = StorageUtil.getCapsule(capsuleData.id);[m
+[32m+[m[32m                        if (storedCapsule && storedCapsule.passphrase) {[m
+[32m+[m[32m                            passphraseToCheck = storedCapsule.passphrase;[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                    }[m
+[32m+[m[41m                    [m
+                     // Use our decryption utility to verify passphrase[m
+[31m-                    const isValid = CryptoUtil.decrypt(capsuleData.passphrase, enteredPassphrase) !== null;[m
+[32m+[m[32m                    const isValid = passphraseToCheck && CryptoUtil.decrypt(passphraseToCheck, enteredPassphrase) !== null;[m
+                     [m
+                     if (enteredPassphrase && isValid) {[m
+                         unlockCapsuleFromURLData(capsuleData);[m
+[36m@@ -1307,9 +1349,18 @@[m [mdocument.addEventListener('DOMContentLoaded', () => {[m
+         document.getElementById('locked-container').classList.add('hidden');[m
+         document.getElementById('unlocked-container').classList.remove('hidden');[m
+         [m
+[32m+[m[32m        // Check if we need to get full message content from storage[m
+[32m+[m[32m        let fullMessage = capsuleData.message;[m
+[32m+[m[32m        if (capsuleData.id && (fullMessage.endsWith('...') || !fullMessage)) {[m
+[32m+[m[32m            const storedCapsule = StorageUtil.getCapsule(capsuleData.id);[m
+[32m+[m[32m            if (storedCapsule && storedCapsule.message) {[m
+[32m+[m[32m                fullMessage = storedCapsule.message;[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+[32m+[m[41m        [m
+         // Set message content[m
+         const messageReveal = document.getElementById('message-reveal');[m
+[31m-        messageReveal.textContent = capsuleData.message;[m
+[32m+[m[32m        messageReveal.textContent = fullMessage;[m
+         [m
+         // Apply theme to message container[m
+         if (typeof ThemeService !== 'undefined' && ThemeService.applyMessageTheme) {[m

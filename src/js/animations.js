@@ -86,9 +86,8 @@ class AnimationManager {
                 }
                 break;
             case 'fireworks':
-                // Use confetti instead of fireworks
-                if (this.confetti.length === 0) {
-                    this.initializeConfetti();
+                if (this.particles.length === 0) {
+                    this.initializeFireworks();
                 }
                 break;
             case 'particles':
@@ -143,8 +142,7 @@ class AnimationManager {
                 this.updateBalloons(deltaTime);
                 break;
             case 'fireworks':
-                // Use confetti instead of fireworks
-                this.updateConfetti(deltaTime);
+                this.updateFireworks(deltaTime);
                 break;
             case 'particles':
                 this.updateParticlesEffect(deltaTime);

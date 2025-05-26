@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Mode Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="responsive.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .section {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            background-color: var(--card-bg-color);
+            color: var(--text-color);
+        }
+        .btn-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .toggle-button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+    <script>
+        // Apply dark mode immediately if stored
+        const darkModeEnabled = localStorage.getItem('darkMode') === 'true' || 
+                               localStorage.getItem('unwraplater_app_theme') === 'dark';
+        if (darkModeEnabled) {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Dark Mode Testing</h1>
+        
+        <div class="btn-container">
+            <button class="toggle-button" id="toggleDarkMode">Toggle Dark Mode</button>
+        </div>
+        
+        <div class="section">
+            <h2>Testing Section</h2>
+            <p>This is a test section to confirm dark mode styling is working correctly.</p>
+            <p>The background color, text color, and other elements should change when toggling dark mode.</p>
+        </div>
+        
+        <div class="section">
+            <h2>Form Elements</h2>
+            <div style="margin-bottom: 1rem;">
+                <label for="test-input">Input Test:</label>
+                <input type="text" id="test-input" placeholder="Test input field">
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label for="test-textarea">Textarea Test:</label>
+                <textarea id="test-textarea" placeholder="Test textarea field"></textarea>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <button class="primary-btn">Primary Button</button>
+                <button class="secondary-btn">Secondary Button</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('toggleDarkMode').addEventListener('click', function() {
+            const htmlElement = document.documentElement;
+            const isDarkMode = htmlElement.classList.toggle('dark-mode');
+            
+            // Save preference
+            localStorage.setItem('darkMode', isDarkMode);
+            localStorage.setItem('unwraplater_app_theme', isDarkMode ? 'dark' : 'light');
+            
+            console.log('Dark mode toggled to:', isDarkMode);
+        });
+    </script>
+</body>
+</html> 

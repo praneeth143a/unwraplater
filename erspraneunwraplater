@@ -1,0 +1,10 @@
+[33mcommit 3e44dbb079c5726e58f8d443d226045bc44a6adc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Your Name <your-email@example.com>
+Date:   Sun Apr 20 20:37:33 2025 +0530
+
+    Add responsive design inspired by Charan Yelimela's portfolio
+
+ index.html     |   1 [32m+[m
+ js/app.js      | 165 [32m+++++++++++++++++++++[m[31m----------------[m
+ responsive.css | 253 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ 3 files changed, 349 insertions(+), 70 deletions(-)

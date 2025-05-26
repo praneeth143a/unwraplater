@@ -27,8 +27,7 @@
 ### 🔐 Privacy & Security
 - All logic is handled **entirely on the client-side** — nothing is ever sent to a server.
 - Messages can be encrypted using the Web Crypto API if a passphrase is provided.
-- Capsule data is embedded in the URL fragment via base64 encoding (after the `#` symbol).
-- This means the link contains everything — it works instantly across devices.
+- This means the link works instantly across devices.
 
 ### 🎨 Polished UI/UX
 - Responsive layout that works great on mobile, tablet, and desktop.
@@ -53,7 +52,7 @@ Try it live here:
 
 1. Compose your message and select a theme.
 2. Set the date and time when it should unlock.
-3. The app encodes all data into a URL-safe format.
+3. The app creates a secure shareable link.
 4. Share the generated link — it will work anywhere.
 5. When someone opens it, the message is revealed (or a countdown appears if it's still locked).
 
@@ -63,7 +62,7 @@ Try it live here:
 
 - **Frontend**: Vanilla HTML, CSS, and JavaScript
 - **Encryption**: Web Crypto API
-- **Storage**: URL fragment with base64-encoded JSON
+- **Storage**: Secure client-side storage
 - **Animations**: Canvas & CSS (zero dependencies!)
 
 ---

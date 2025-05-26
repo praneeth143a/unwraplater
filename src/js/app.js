@@ -5,6 +5,9 @@
 
 class TimeCapsuleApp {
     constructor() {
+        // Configuration
+        this.MAX_CHAR_LIMIT = 800; // Maximum character limit for message length
+        
         // Views
         this.createView = document.getElementById('create-view');
         this.resultView = document.getElementById('result-view');
@@ -21,7 +24,6 @@ class TimeCapsuleApp {
         this.charLimit = document.getElementById('char-limit');
         this.messageWarning = document.getElementById('message-warning');
         this.charCounter = document.querySelector('.char-counter');
-        this.MAX_CHAR_LIMIT = 800; // Maximum character limit for reliable URL generation
         
         // Result elements
         this.capsuleLinkInput = document.getElementById('capsule-link');
@@ -107,19 +109,19 @@ class TimeCapsuleApp {
         const whatsappBtn = document.getElementById('share-whatsapp');
         if (whatsappBtn) {
             whatsappBtn.addEventListener('click', () => {
-                if (!this.currentCapsule) {
+                    if (!this.currentCapsule) {
                     this.showToast('No capsule available to share.');
-                    return;
-                }
-                
-                // Always use long URL for sharing
-                const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
-                
+                        return;
+                    }
+                    
+                    // Always use long URL for sharing
+                    const capsuleLink = this.generateCapsuleLink(this.currentCapsule.data, true);
+                    
                 // Open WhatsApp web with pre-filled message
                 const shareUrl = `https://wa.me/?text=${encodeURIComponent(capsuleLink)}`;
-                window.open(shareUrl, '_blank');
-            });
-        }
+                    window.open(shareUrl, '_blank');
+                });
+            }
         
         // Web Share API
         const shareApiBtn = document.getElementById('share-api');
@@ -228,9 +230,7 @@ class TimeCapsuleApp {
         // Start animations for specific views
         if (view === this.unlockView && !this.isLocked) {
             const currentTheme = themesManager.getCurrentTheme();
-            // Use confetti animation if the theme specifies fireworks
-            const animation = currentTheme.animation === 'fireworks' ? 'confetti' : currentTheme.animation;
-            animationManager.startAnimation(animation);
+            animationManager.startAnimation(currentTheme.animation);
             
             // If theme uses confetti, trigger a burst
             if (currentTheme.useConfetti) {
@@ -346,7 +346,7 @@ class TimeCapsuleApp {
             }
         }
         
-        // Generate and display the capsule link by embedding the data in the URL
+        // Generate and display the capsule link
         const useLongUrl = document.getElementById('url-format-toggle').checked;
         const capsuleLink = this.generateCapsuleLink(capsuleData, useLongUrl);
         this.capsuleLinkInput.value = capsuleLink;
@@ -361,10 +361,11 @@ class TimeCapsuleApp {
     }
     
     /**
-     * Generate a shareable link by encoding the capsule data into the URL hash
+     * Generate a shareable link for the time capsule
+     * 
      * @param {Object} capsuleData - The capsule data object
      * @param {boolean} useLongUrl - Whether to use a full URL with origin (true) or just a relative URL (false)
-     * @returns {string} - The shareable URL with encoded capsule data
+     * @returns {string} - The shareable URL
      */
     generateCapsuleLink(capsuleData, useLongUrl = true) {
         try {
@@ -487,8 +488,7 @@ class TimeCapsuleApp {
     }
     
     /**
-     * Check if the URL contains a capsule in the hash
-     * If found, attempt to decode and load it
+     * Check if the current URL contains a capsule
      */
     checkForCapsuleInUrl() {
         const hash = window.location.hash;
@@ -500,8 +500,10 @@ class TimeCapsuleApp {
     }
     
     /**
-     * Decode capsule data from a URL hash
-     * @param {string} encodedData - Base64 encoded capsule data
+     * Decode capsule data from the provided information
+     * 
+     * @param {string} encodedData - The encoded capsule data
+     * @returns {Object|null} - The decoded capsule data or null if invalid
      */
     decodeCapsuleFromHash(encodedData) {
         try {
@@ -659,9 +661,7 @@ class TimeCapsuleApp {
                 
                 // Start animation
                 const currentTheme = themesManager.getCurrentTheme();
-                // Use confetti animation if the theme specifies fireworks
-                const animation = currentTheme.animation === 'fireworks' ? 'confetti' : currentTheme.animation;
-                animationManager.startAnimation(animation);
+                animationManager.startAnimation(currentTheme.animation);
                 
                 return;
             }
@@ -733,9 +733,7 @@ class TimeCapsuleApp {
         // Start animation if not already started
         if (!animationManager.isActive) {
             const currentTheme = themesManager.getCurrentTheme();
-            // Use confetti animation if the theme specifies fireworks
-            const animation = currentTheme.animation === 'fireworks' ? 'confetti' : currentTheme.animation;
-            animationManager.startAnimation(animation);
+            animationManager.startAnimation(currentTheme.animation);
             
             // If theme uses confetti, trigger a burst
             if (currentTheme.useConfetti) {

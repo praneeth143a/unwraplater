@@ -1,0 +1,278 @@
+/* responsive.css - Enhanced mobile responsiveness for UnwrapLater */
+
+/* Global Responsive Styling */
+:root {
+  --mobile-padding: 16px;
+  --tablet-padding: 24px;
+  --desktop-padding: 32px;
+  --animation-duration: 0.3s;
+  --content-max-width: 1200px;
+  --section-border-radius: 12px;
+  --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Better Base Responsiveness */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  transition: background-color var(--animation-duration) ease,
+              color var(--animation-duration) ease;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* Container with max-width constraint */
+.container {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--mobile-padding);
+}
+
+/* Responsive Typography */
+h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.025em;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  margin-bottom: 1.25rem;
+}
+
+p {
+  font-size: clamp(1rem, 2vw, 1.125rem);
+}
+
+/* Enhanced Card Container for Mobile */
+section {
+  border-radius: var(--section-border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 2rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Message Container Enhancement */
+#message-reveal {
+  width: 100%;
+  max-width: 100%;
+  padding: clamp(1rem, 5vw, 2rem);
+}
+
+/* Time Capsule Message Box - Enhanced */
+#message-reveal div {
+  background-color: white;
+  color: #000;
+  font-weight: 500;
+  padding: clamp(1rem, 5vw, 2rem);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin: 0 auto;
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.8;
+  font-size: clamp(1rem, 3vw, 1.25rem);
+}
+
+/* Responsive Animation Container */
+#theme-animation-container {
+  overflow: hidden;
+  border-radius: var(--section-border-radius);
+}
+
+/* Responsive Button Styling */
+.primary-btn, .secondary-btn {
+  padding: clamp(0.75rem, 3vw, 1rem) clamp(1rem, 5vw, 2rem);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  transition: all 0.2s ease;
+}
+
+/* Enhanced Button Container */
+.action-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+/* Responsive Form Elements */
+input, textarea, select {
+  padding: clamp(0.75rem, 2vw, 1rem);
+  border-radius: 8px;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Tablet Responsiveness */
+@media (min-width: 640px) {
+  .container {
+    padding: 0 var(--tablet-padding);
+  }
+  
+  section {
+    padding: clamp(1.5rem, 4vw, 2rem);
+  }
+}
+
+/* Desktop Responsiveness */
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 var(--desktop-padding);
+  }
+  
+  section {
+    padding: clamp(2rem, 5vw, 3rem);
+  }
+}
+
+/* Mobile-first Layout Adjustments */
+@media (max-width: 768px) {
+  /* Header Mobile Enhancement */
+  header {
+    padding: 1rem 0;
+  }
+  
+  /* Button stack on mobile */
+  .preview-actions,
+  .unlock-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  /* Improved Mobile Theme Selector */
+  .theme-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  /* Mobile Direct Message Container */
+  #direct-message-container {
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  
+  /* Mobile Message Box */
+  #message-reveal div {
+    width: 100%;
+    margin: 1rem auto;
+  }
+  
+  /* Enhanced Mobile Countdown */
+  #time-remaining {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  /* Improved form spacing on mobile */
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Share Buttons on Mobile */
+  .share-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Small Phone Specific Adjustments */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  h2 {
+    font-size: 1.35rem;
+  }
+  
+  /* Single column on very small screens */
+  .theme-selector,
+  .share-buttons,
+  #time-remaining {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Extra padding for better tap targets */
+  input, 
+  textarea, 
+  select,
+  .primary-btn, 
+  .secondary-btn {
+    padding: 0.875rem;
+  }
+  
+  /* Ensure message box fits on small screens */
+  #message-reveal div {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Animation Enhancements */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* Enhanced Message Visibility */
+#unlocked-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--section-border-radius);
+}
+
+/* Dark Mode Improvements for Mobile */
+.dark-mode #message-reveal div {
+  background-color: #2a2a2a;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark mode responsive adjustments */
+.dark-mode #message-reveal div {
+  background-color: #2a2a2a;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark mode mobile adjustments */
+@media (max-width: 768px) {
+  .dark-mode .theme-option {
+    background-color: #2a2a2a;
+    border-color: #333;
+  }
+  
+  .dark-mode .countdown-item {
+    background-color: #2a2a2a;
+  }
+  
+  .dark-mode .preview-actions button,
+  .dark-mode .primary-btn, 
+  .dark-mode .secondary-btn {
+    background-color: #333;
+  }
+}
+
+/* Ensure content doesn't overflow */
+img, video, canvas {
+  max-width: 100%;
+  height: auto;
+} 
